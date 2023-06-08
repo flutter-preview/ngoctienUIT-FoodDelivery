@@ -16,43 +16,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import com.tnt.food_delivery.ui.theme.Inter
-import java.nio.file.WatchEvent
 
 @ExperimentalTextApi
 @ExperimentalMaterial3Api
 @Composable
-fun SignIn() {
+fun SignInScreen() {
 //    var text by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold {
@@ -97,8 +89,16 @@ fun SignIn() {
                         .fillMaxWidth()
                         .padding(horizontal = 25.dp)
                         .border(
-                            width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                        )
+                        .shadow(
+                            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+                            spread = 20.dp,
+                            blurRadius = 50.dp,
+                            offsetX = 12.dp,
+                            offsetY = 26.dp,
                         ),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
                     value = "",
                     onValueChange = { },
                     placeholder = { Text(text = "Email") },
@@ -110,8 +110,16 @@ fun SignIn() {
                         .fillMaxWidth()
                         .padding(horizontal = 25.dp)
                         .border(
-                            width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                        )
+                        .shadow(
+                            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+                            spread = 20.dp,
+                            blurRadius = 50.dp,
+                            offsetX = 12.dp,
+                            offsetY = 26.dp,
                         ),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
                     value = "",
                     onValueChange = { },
                     placeholder = { Text(text = "Password") },
@@ -154,7 +162,7 @@ fun CustomSocialButton(text: String, onClick: () -> Unit = { }, id: Int) {
             .clickable { onClick() }
             .border(
                 width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
-            ),
+            ).background(color = Color.White),
     ) {
         Image(
             modifier = Modifier.height(35.dp),
@@ -172,6 +180,6 @@ fun CustomSocialButton(text: String, onClick: () -> Unit = { }, id: Int) {
 @Composable
 fun SignInPreview() {
     FoodDeliveryTheme {
-        SignIn()
+        SignInScreen()
     }
 }

@@ -2,10 +2,8 @@ package com.tnt.food_delivery.presentation.sign_up
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,15 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,13 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import com.tnt.food_delivery.ui.theme.Inter
 
 @ExperimentalTextApi
 @ExperimentalMaterial3Api
 @Composable
-fun SignUp() {
+fun SignUpScreen() {
     Scaffold() {
         it
         Box() {
@@ -113,8 +109,16 @@ fun CustomTextField(id: Int, placeholder: String) {
             .padding(horizontal = 25.dp)
             .border(
                 width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+            )
+            .shadow(
+                color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+                spread = 20.dp,
+                blurRadius = 50.dp,
+                offsetX = 12.dp,
+                offsetY = 26.dp,
             ),
         value = "",
+        colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
         onValueChange = { },
         placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B)) },
         shape = RoundedCornerShape(15),
@@ -134,6 +138,6 @@ fun CustomTextField(id: Int, placeholder: String) {
 @Composable
 fun SignUpPreview() {
     FoodDeliveryTheme {
-        SignUp()
+        SignUpScreen()
     }
 }
