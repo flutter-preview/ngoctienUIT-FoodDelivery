@@ -22,7 +22,7 @@ fun GradientButton(
     text: String,
     gradient: Brush = Brush.horizontalGradient(listOf(Color(0xFF53E88B), Color(0xFF15BE77))),
     onClick: () -> Unit = { },
-    radius: Int = 15,
+    radius: Int = 30,
     textStyle: TextStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
 ) {
     Button(

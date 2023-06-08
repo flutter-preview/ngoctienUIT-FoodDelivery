@@ -108,7 +108,7 @@ fun CustomTextField(id: Int, placeholder: String) {
             .fillMaxWidth()
             .padding(horizontal = 25.dp)
             .border(
-                width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
             )
             .shadow(
                 color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
@@ -120,8 +120,8 @@ fun CustomTextField(id: Int, placeholder: String) {
         value = "",
         colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
         onValueChange = { },
-        placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B)) },
-        shape = RoundedCornerShape(15),
+        placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B).copy(alpha = 0.3f)) },
+        shape = RoundedCornerShape(30),
         leadingIcon = {
             Image(
                 modifier = Modifier
