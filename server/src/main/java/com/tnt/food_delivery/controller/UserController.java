@@ -9,17 +9,7 @@ import com.tnt.food_delivery.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -27,11 +17,25 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserByID(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(userRepository.findById(id).get());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Không tìm thấy thông tin người dùng");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequestEntity authentication) {
-        User user = userRepository.login(authentication.getUsername(), authentication.getPassword());
-        AuthenticationResponseEntity response = new AuthenticationResponseEntity(JwtUtils.renderAccessToken(user), user);
-        return ResponseEntity.ok(response);
+        try {
+            User user = userRepository.login(authentication.getUsername(), authentication.getPassword());
+            AuthenticationResponseEntity response = new AuthenticationResponseEntity(JwtUtils.renderAccessToken(user), user);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Tài khoản hoặc mật khẩu chưa chính xác");
+        }
+
     }
 
     @PostMapping("/signup")
@@ -45,6 +49,41 @@ public class UserController {
             return ResponseEntity.status(400).body(error);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(e);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@RequestHeader(name = "Authorization") String token,
+                                        @PathVariable String id,
+                                        @RequestBody User user) {
+        try {
+            String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
+            String userID = content.split("~")[0];
+            String role = content.split("~")[1];
+            if (userID.equals(id) || role.equals("ADMIN")) {
+                user.setId(id);
+                return ResponseEntity.ok(userRepository.save(user));
+            }
+            return ResponseEntity.badRequest().body("Bạn không có quyền thay đổi thông tin người dùng này");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@RequestHeader(name = "Authorization") String token, @PathVariable String id) {
+        try {
+            String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
+            String userID = content.split("~")[0];
+            String role = content.split("~")[1];
+            if (userID.equals(id) || role.equals("ADMIN")) {
+                userRepository.deleteById(id);
+                return ResponseEntity.ok("ok");
+            }
+            return ResponseEntity.badRequest().body("Bạn không có quyền xóa người dùng này");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
