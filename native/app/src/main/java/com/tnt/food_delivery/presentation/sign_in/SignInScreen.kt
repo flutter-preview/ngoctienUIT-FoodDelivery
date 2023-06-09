@@ -22,6 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +50,8 @@ import com.tnt.food_delivery.ui.theme.Inter
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen() {
-//    var text by remember { mutableStateOf(TextFieldValue("")) }
+    var username by remember { mutableStateOf(TextFieldValue("")) }
+    var password by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold {
         it
@@ -89,7 +95,7 @@ fun SignInScreen() {
                         .fillMaxWidth()
                         .padding(horizontal = 25.dp)
                         .border(
-                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
                         )
                         .shadow(
                             color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
@@ -99,10 +105,10 @@ fun SignInScreen() {
                             offsetY = 26.dp,
                         ),
                     colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-                    value = "",
-                    onValueChange = { },
-                    placeholder = { Text(text = "Email") },
-                    shape = RoundedCornerShape(15),
+                    value = username,
+                    onValueChange = { text -> username = text },
+                    placeholder = { Text(text = "Username") },
+                    shape = RoundedCornerShape(30),
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
@@ -110,7 +116,7 @@ fun SignInScreen() {
                         .fillMaxWidth()
                         .padding(horizontal = 25.dp)
                         .border(
-                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
+                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
                         )
                         .shadow(
                             color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
@@ -120,10 +126,10 @@ fun SignInScreen() {
                             offsetY = 26.dp,
                         ),
                     colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-                    value = "",
-                    onValueChange = { },
+                    value = password,
+                    onValueChange = { text -> password = text },
                     placeholder = { Text(text = "Password") },
-                    shape = RoundedCornerShape(15),
+                    shape = RoundedCornerShape(30),
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Or Continue With", fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -142,6 +148,7 @@ fun SignInScreen() {
                 Spacer(modifier = Modifier.height(36.dp))
                 GradientButton(
                     text = "Login",
+                    onClick = { },
                     modifier = Modifier
                         .height(56.dp)
                         .width(157.dp),
@@ -161,8 +168,9 @@ fun CustomSocialButton(text: String, onClick: () -> Unit = { }, id: Int) {
             .width(152.dp)
             .clickable { onClick() }
             .border(
-                width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(15),
-            ).background(color = Color.White),
+                width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
+            )
+            .background(color = Color.White),
     ) {
         Image(
             modifier = Modifier.height(35.dp),

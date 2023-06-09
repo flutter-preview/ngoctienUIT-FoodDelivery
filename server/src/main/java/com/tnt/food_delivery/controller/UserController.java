@@ -1,7 +1,9 @@
 package com.tnt.food_delivery.controller;
 
+import com.tnt.food_delivery.common.JwtUtils;
 import com.tnt.food_delivery.model.User;
 import com.tnt.food_delivery.model.request.AuthenticationRequestEntity;
+import com.tnt.food_delivery.model.response.AuthenticationResponseEntity;
 import com.tnt.food_delivery.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequestEntity authentication) {
         User user = userRepository.login(authentication.getUsername(), authentication.getPassword());
-        return ResponseEntity.ok(user);
+        AuthenticationResponseEntity response = new AuthenticationResponseEntity(JwtUtils.renderAccessToken(user), user);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup")
