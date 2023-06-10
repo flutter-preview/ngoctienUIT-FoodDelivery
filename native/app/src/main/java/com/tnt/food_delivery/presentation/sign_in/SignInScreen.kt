@@ -51,7 +51,7 @@ fun SignInScreen() {
 
     Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.background_light),

@@ -2,7 +2,6 @@ package com.tnt.food_delivery.presentation.splash.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +27,7 @@ fun LogoApp() {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Image(
-            painter = painterResource(id = R.drawable.icon_login),
+            painter = painterResource(id = R.drawable.logo_app),
             contentDescription = "icon logo",
             modifier = Modifier.fillMaxWidth(),
         )

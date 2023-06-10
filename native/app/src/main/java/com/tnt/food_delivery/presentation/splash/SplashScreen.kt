@@ -20,9 +20,9 @@ import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplashScreen() {
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.background_light),

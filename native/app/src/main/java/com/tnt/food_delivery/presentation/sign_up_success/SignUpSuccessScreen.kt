@@ -43,9 +43,9 @@ import com.tnt.food_delivery.ui.theme.Viga
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun SignUpSuccessScreen() {
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.success_background),

@@ -2,9 +2,6 @@
 
 package com.tnt.food_delivery.presentation.onboarding
 
-import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +31,6 @@ import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
-import java.util.Objects
 
 @ExperimentalMaterial3Api
 @Composable

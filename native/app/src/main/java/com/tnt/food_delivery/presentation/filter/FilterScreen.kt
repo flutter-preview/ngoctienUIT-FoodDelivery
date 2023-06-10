@@ -36,16 +36,16 @@ import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun FilterScreen() {
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.triangle_home_background),
                 contentDescription = "tnt"
             )
             Column(
-                modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                modifier = Modifier.padding(horizontal = 25.dp),
             ) {
                 Row(
                     modifier = Modifier
@@ -94,14 +94,14 @@ fun FilterScreen() {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Type", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
-                Row() {
+                Row {
                     CustomItemFilter(text = "Restaurant")
                     CustomItemFilter(text = "Menu")
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(text = "Location", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(10.dp))
-                Row() {
+                Row {
                     CustomItemFilter(text = "1 Km")
                     CustomItemFilter(text = ">10 Km")
                     CustomItemFilter(text = "<10 Km")
@@ -109,7 +109,7 @@ fun FilterScreen() {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(text = "Food", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(10.dp))
-                FlowRow() {
+                FlowRow {
                     CustomItemFilter(text = "Cake")
                     CustomItemFilter(text = "Soup")
                     CustomItemFilter(text = "Main Course")

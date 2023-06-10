@@ -25,22 +25,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.presentation.payment_method.components.BackButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadPhotoScreen() {
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.triangle_background),
@@ -49,24 +53,8 @@ fun UploadPhotoScreen() {
             Column(
                 modifier = Modifier.padding(start = 25.dp, end = 25.dp),
             ) {
-                Card(
-                    modifier = Modifier.padding(top = 38.dp, bottom = 20.dp),
-                    shape = RoundedCornerShape(15),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF9A84D).copy(alpha = 0.1f))
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(45.dp)
-                            .height(45.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Arrow Back Icon",
-                            tint = Color(0xFFDA6317)
-                        )
-                    }
+                BackButton {
+
                 }
                 Text(
                     modifier = Modifier.padding(end = 60.dp),
@@ -119,7 +107,7 @@ fun CustomUploadPhoto(onClick: () -> Unit = { }, id: Int, text: String) {
                 .background(color = Color.White),
             contentAlignment = Alignment.Center,
         ) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
                     painter = painterResource(id = id),
                     contentDescription = "TNT"

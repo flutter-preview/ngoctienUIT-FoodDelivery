@@ -32,15 +32,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.presentation.payment_method.components.BackButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetLocationScreen() {
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.triangle_background),
@@ -49,24 +50,8 @@ fun SetLocationScreen() {
             Column(
                 modifier = Modifier.padding(start = 25.dp, end = 25.dp),
             ) {
-                Card(
-                    modifier = Modifier.padding(top = 38.dp, bottom = 20.dp),
-                    shape = RoundedCornerShape(15),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF9A84D).copy(alpha = 0.1f))
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(45.dp)
-                            .height(45.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Arrow Back Icon",
-                            tint = Color(0xFFDA6317)
-                        )
-                    }
+                BackButton {
+
                 }
                 Text(
                     modifier = Modifier.padding(end = 60.dp),

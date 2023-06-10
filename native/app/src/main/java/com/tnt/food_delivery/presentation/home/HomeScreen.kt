@@ -1,6 +1,5 @@
 package com.tnt.food_delivery.presentation.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,7 @@ import com.tnt.food_delivery.R
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
     val list: List<Map<String, Any>> = listOf(
@@ -55,16 +54,16 @@ fun HomeScreen() {
         )
     )
 
-    Scaffold() {
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.triangle_home_background),
                 contentDescription = "tnt"
             )
             Column(
-                modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                modifier = Modifier.padding(horizontal = 25.dp),
             ) {
                 Row(
                     modifier = Modifier
@@ -203,7 +202,7 @@ fun HomeScreen() {
                 LazyRow()
                 {
                     items(3) { index ->
-                        Row() {
+                        Row {
                             Card(
                                 modifier = Modifier
                                     .height(180.dp)
@@ -219,7 +218,7 @@ fun HomeScreen() {
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
                                 shape = RoundedCornerShape(15)
                             ) {
-                                Column() {
+                                Column {
                                     Image(
                                         painter = painterResource(id = list[index]["image"] as Int),
                                         contentDescription = "tnt"

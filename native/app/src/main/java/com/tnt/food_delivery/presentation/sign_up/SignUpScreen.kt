@@ -18,12 +18,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,9 +42,13 @@ import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen() {
-    Scaffold() {
+    var username by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf(TextFieldValue("")) }
+    var password by remember { mutableStateOf(TextFieldValue("")) }
+
+    Scaffold {
         it
-        Box() {
+        Box {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.background_light),
@@ -54,11 +63,26 @@ fun SignUpScreen() {
                 Spacer(modifier = Modifier.height(60.dp))
                 Text(text = "Sign Up For Free", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(40.dp))
-                CustomTextField(id = R.drawable.icon_profile, placeholder = "Username")
+                CustomTextField(
+                    icon = R.drawable.icon_profile,
+                    value = username,
+                    onValueChange = { value -> username = value },
+                    placeholder = "Username"
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomTextField(id = R.drawable.icon_email, placeholder = "Email")
+                CustomTextField(
+                    icon = R.drawable.icon_email,
+                    value = email,
+                    onValueChange = { value -> email = value },
+                    placeholder = "Email"
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomTextField(id = R.drawable.icon_lock, placeholder = "Password")
+                CustomTextField(
+                    icon = R.drawable.icon_lock,
+                    value = password,
+                    onValueChange = { value -> password = value },
+                    placeholder = "Password"
+                )
                 Spacer(modifier = Modifier.height(44.dp))
                 GradientButton(
                     text = "Create Account",
@@ -77,7 +101,12 @@ fun SignUpScreen() {
 
 @ExperimentalMaterial3Api
 @Composable
-fun CustomTextField(id: Int, placeholder: String) {
+fun CustomTextField(
+    icon: Int,
+    placeholder: String,
+    value: TextFieldValue,
+    onValueChange: (value: TextFieldValue) -> Unit
+) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -92,16 +121,16 @@ fun CustomTextField(id: Int, placeholder: String) {
                 offsetX = 12.dp,
                 offsetY = 26.dp,
             ),
-        value = "",
+        value = value,
         colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-        onValueChange = { },
+        onValueChange = onValueChange,
         placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B).copy(alpha = 0.3f)) },
         shape = RoundedCornerShape(30),
         leadingIcon = {
             Image(
                 modifier = Modifier
                     .height(30.dp),
-                painter = painterResource(id = id),
+                painter = painterResource(id = icon),
                 contentDescription = "icon profile",
             )
         }
