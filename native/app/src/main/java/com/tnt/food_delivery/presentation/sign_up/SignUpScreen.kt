@@ -59,6 +59,7 @@ fun SignUpScreen() {
 //                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxSize(),
             ) {
+                Spacer(modifier = Modifier.height(40.dp))
                 LogoApp()
                 Spacer(modifier = Modifier.height(60.dp))
                 Text(text = "Sign Up For Free", fontSize = 20.sp, fontWeight = FontWeight.Bold)
