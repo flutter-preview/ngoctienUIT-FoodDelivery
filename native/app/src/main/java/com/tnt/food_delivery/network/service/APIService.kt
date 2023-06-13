@@ -1,7 +1,7 @@
 package com.tnt.food_delivery.network.service
 
-import com.tnt.food_delivery.model.response.AuthenticationResponse
-import com.tnt.food_delivery.model.response.UserResponse
+import com.tnt.food_delivery.data.response.AuthenticationResponse
+import com.tnt.food_delivery.data.response.UserResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response

@@ -25,39 +25,64 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.network.service.APIService
+import com.tnt.food_delivery.core.utils.NavDestinations
+import com.tnt.food_delivery.data.DataStoreManager
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.presentation.splash.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import java.lang.Exception
 
 @ExperimentalTextApi
 @ExperimentalMaterial3Api
 @Composable
-fun SignInScreen() {
+fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
+    val authentication by viewModel.authentication.observeAsState(initial = null)
+    val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
     val coroutineScope = rememberCoroutineScope()
+
+    if (authentication != null) {
+        LaunchedEffect(true)
+        {
+            coroutineScope.launch {
+                authentication!!.token?.let { dataStoreManager.setString("token", it) }
+                authentication!!.user!!.id?.let { it1 -> dataStoreManager.setString("userID", it1) }
+            }
+            navController.navigate(NavDestinations.MAIN_SCREEN)
+            {
+                popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
+            }
+            Log.d("sign in data", authentication.toString())
+        }
+
+    }
 
     Scaffold {
         it
@@ -132,24 +157,25 @@ fun SignInScreen() {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(onClick = { }) {
-                    Text(text = "Forgot Your Password?")
+                    Text(
+                        text = "Forgot Your Password?", style = TextStyle(
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF53E88B), Color(0xFF15BE77))
+                            )
+                        )
+                    )
                 }
                 Spacer(modifier = Modifier.height(36.dp))
                 GradientButton(
                     text = "Login",
                     onClick = {
                         try {
-                            coroutineScope.launch {
-                                val apiService = APIService.getInstance()
-                                val data = apiService.login(
-                                    body = mapOf(
-                                        "username" to username.text,
-                                        "password" to password.text
-                                    )
+                            viewModel.login(
+                                mapOf(
+                                    "username" to username.text,
+                                    "password" to password.text
                                 )
-                                Log.d("data", data.body().toString())
-                            }
-
+                            )
                         } catch (e: Exception) {
                             println(e.message.toString())
                             Log.d("error", e.message.toString())
@@ -159,7 +185,22 @@ fun SignInScreen() {
                         .height(56.dp)
                         .width(157.dp),
                 )
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+                TextButton(onClick = {
+                    navController.navigate(NavDestinations.SIGNUP_SCREEN)
+                    {
+                        popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
+                    }
+                }) {
+                    Text(
+                        text = "You don't have an account?", style = TextStyle(
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF53E88B), Color(0xFF15BE77))
+                            )
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
@@ -195,6 +236,6 @@ fun CustomSocialButton(text: String, onClick: () -> Unit = { }, id: Int) {
 @Composable
 fun SignInPreview() {
     FoodDeliveryTheme {
-        SignInScreen()
+        SignInScreen(rememberNavController())
     }
 }
