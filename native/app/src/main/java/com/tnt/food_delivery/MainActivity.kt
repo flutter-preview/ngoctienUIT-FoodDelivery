@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.core.utils.NavDestinations
+import com.tnt.food_delivery.presentation.filter.FilterScreen
 import com.tnt.food_delivery.presentation.main.MainScreen
 import com.tnt.food_delivery.presentation.sign_in.SignInScreen
 import com.tnt.food_delivery.presentation.sign_up.SignUpScreen
@@ -51,6 +52,9 @@ fun MyApp() {
                 }
                 composable(NavDestinations.MAIN_SCREEN) {
                     MainScreen(navController)
+                }
+                composable(NavDestinations.FILTER_SCREEN) {
+                    FilterScreen(navController)
                 }
             }
         }

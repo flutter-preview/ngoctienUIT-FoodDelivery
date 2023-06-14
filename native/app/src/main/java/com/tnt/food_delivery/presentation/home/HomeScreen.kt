@@ -1,6 +1,7 @@
 package com.tnt.food_delivery.presentation.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     val list: List<Map<String, Any>> = listOf(
         mapOf(
             "image" to R.drawable.tempt_image,
@@ -145,7 +149,10 @@ fun HomeScreen() {
                     Card(
                         modifier = Modifier
                             .height(50.dp)
-                            .width(50.dp),
+                            .width(50.dp)
+                            .clickable {
+                                navController.navigate(NavDestinations.FILTER_SCREEN)
+                            },
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFF9A84D).copy(alpha = 0.1f)
@@ -241,6 +248,6 @@ fun HomeScreen() {
 @Composable
 fun HomePreview() {
     FoodDeliveryTheme {
-        HomeScreen()
+        HomeScreen(rememberNavController())
     }
 }
