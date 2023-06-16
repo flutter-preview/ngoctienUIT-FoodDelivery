@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
@@ -44,14 +47,17 @@ import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.presentation.splash.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
+import kotlinx.coroutines.launch
 
 @ExperimentalTextApi
 @ExperimentalMaterial3Api
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
+    val coroutineScope = rememberCoroutineScope()
+    val state by viewModel.authentication.observeAsState()
 
     Scaffold {
         it
@@ -99,6 +105,11 @@ fun SignUpScreen(navController: NavController) {
                     modifier = Modifier
                         .height(56.dp)
                         .width(157.dp),
+                    onClick = {
+                        coroutineScope.launch {
+                            viewModel.signUp(mapOf())
+                        }
+                    }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(onClick = {

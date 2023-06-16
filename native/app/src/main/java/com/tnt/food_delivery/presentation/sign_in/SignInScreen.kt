@@ -1,6 +1,12 @@
 package com.tnt.food_delivery.presentation.sign_in
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,13 +20,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -34,21 +45,30 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.core.components.ShowLoading
+import com.tnt.food_delivery.core.components.showToast
+import com.tnt.food_delivery.core.utils.EventResults
+import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.data.DataStoreManager
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
@@ -64,25 +84,42 @@ import java.lang.Exception
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
-    val authentication by viewModel.authentication.observeAsState(initial = null)
-    val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
+    val state by viewModel.authentication.observeAsState()
+    val context = LocalContext.current
+    val dataStoreManager = DataStoreManager(context)
     val coroutineScope = rememberCoroutineScope()
 
-    if (authentication != null) {
-        LaunchedEffect(true)
-        {
-            coroutineScope.launch {
-                authentication!!.token?.let { dataStoreManager.setString("token", it) }
-                authentication!!.user!!.id?.let { it1 -> dataStoreManager.setString("userID", it1) }
+    LaunchedEffect(state)
+    {
+        Log.d("check", "ok")
+        when (state!!.status) {
+            EventStatus.SUCCESS -> {
+                coroutineScope.launch {
+                    state!!.data!!.token?.let { dataStoreManager.setString("token", it) }
+                    state!!.data!!.user!!.id?.let { id ->
+                        dataStoreManager.setString("userID", id)
+                    }
+                }
+                navController.navigate(NavDestinations.MAIN_SCREEN)
+                {
+                    popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
+                }
+                Log.d("sign in data", state!!.data.toString())
             }
-            navController.navigate(NavDestinations.MAIN_SCREEN)
-            {
-                popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
-            }
-            Log.d("sign in data", authentication.toString())
-        }
 
+            EventStatus.LOADING -> {
+                Log.d("Loading", "Loading")
+            }
+
+            EventStatus.ERROR -> {
+                Log.d("Error", state!!.error ?: "Lỗi bất định")
+                showToast(context, state!!.error ?: "Lỗi bất định");
+            }
+
+            else -> {}
+        }
     }
+
 
     Scaffold {
         it
@@ -169,16 +206,13 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                 GradientButton(
                     text = "Login",
                     onClick = {
-                        try {
+                        coroutineScope.launch {
                             viewModel.login(
                                 mapOf(
                                     "username" to username.text,
                                     "password" to password.text
                                 )
                             )
-                        } catch (e: Exception) {
-                            println(e.message.toString())
-                            Log.d("error", e.message.toString())
                         }
                     },
                     modifier = Modifier
@@ -201,6 +235,7 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                     )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
+                if (state!!.status == EventStatus.LOADING) ShowLoading()
             }
         }
     }

@@ -32,15 +32,15 @@ public class User {
     private String birthOfDate;
 
     @NonNull
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String username;
 
     @NonNull
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String email;
 
     @NonNull
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String phoneNumber;
 
     @NonNull
@@ -53,11 +53,22 @@ public class User {
 
     @Builder.Default
     private UserRole userRole = UserRole.USER;
+
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVATED;
+
     public enum UserRole {
         NO_ROLE,
         USER,
         DELIVER,
         RESTAURANT,
         ADMIN
+    }
+
+    public enum UserStatus {
+        NOT_VERIFIED,
+        ACTIVATED,
+        BLOCKED,
+        DELETED,
     }
 }

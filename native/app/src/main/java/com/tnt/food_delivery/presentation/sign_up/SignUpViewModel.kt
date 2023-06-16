@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.presentation.sign_in
+package com.tnt.food_delivery.presentation.sign_up
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,23 +8,24 @@ import androidx.lifecycle.viewModelScope
 import com.tnt.food_delivery.core.utils.EventResults
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.data.response.AuthenticationResponse
+import com.tnt.food_delivery.data.response.UserResponse
 import com.tnt.food_delivery.network.api.AuthService
 import com.tnt.food_delivery.network.di.NetworkModule
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class SignInViewModel : ViewModel() {
+class SignUpViewModel : ViewModel() {
     private val authService: AuthService = NetworkModule.provideAuthService()
-    private val _authentication: MutableLiveData<EventResults<AuthenticationResponse>> =
+    private val _authentication: MutableLiveData<EventResults<UserResponse>> =
         MutableLiveData(EventResults())
-    val authentication: LiveData<EventResults<AuthenticationResponse>> = _authentication
+    val authentication: LiveData<EventResults<UserResponse>> = _authentication
 
-    suspend fun login(body: Map<String, String>) {
+    suspend fun signUp(body: Map<String, String>) {
         Log.d("test", "login")
         _authentication.value = EventResults(status = EventStatus.LOADING)
         viewModelScope.launch {
             try {
-                val data = authService.login(body)
+                val data = authService.signup(body)
                 if (data.isSuccessful) {
                     _authentication.value =
                         EventResults(status = EventStatus.SUCCESS, data = data.body())
@@ -35,7 +36,6 @@ class SignInViewModel : ViewModel() {
                         EventResults(status = EventStatus.ERROR, error = errMsg)
                     Log.d("error data", errMsg)
                 }
-
             } catch (e: Exception) {
                 println(e.message.toString())
                 _authentication.value = EventResults(status = EventStatus.ERROR, error = e.message)
