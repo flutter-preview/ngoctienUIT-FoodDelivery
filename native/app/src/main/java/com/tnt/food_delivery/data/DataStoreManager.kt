@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.tnt.food_delivery.core.utils.Constants.FOOD_TNT_DATASTORE
+import com.tnt.food_delivery.core.utils.constants.Constants.FOOD_TNT_DATASTORE
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = FOOD_TNT_DATASTORE)

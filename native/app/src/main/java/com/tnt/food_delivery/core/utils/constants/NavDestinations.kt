@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.core.utils
+package com.tnt.food_delivery.core.utils.constants
 
 object NavDestinations {
     const val SIGNIN_SCREEN = "SIGNIN_SCREEN"

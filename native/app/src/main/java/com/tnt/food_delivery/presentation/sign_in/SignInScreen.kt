@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,17 +47,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.core.utils.NavDestinations
+import com.tnt.food_delivery.core.utils.constants.NavDestinations
 import com.tnt.food_delivery.data.DataStoreManager
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.presentation.splash.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
+import ru.tech.cookhelper.presentation.ui.utils.event.Event
+import ru.tech.cookhelper.presentation.ui.utils.event.collectWithLifecycle
 import java.lang.Exception
+import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 @ExperimentalTextApi
 @ExperimentalMaterial3Api
@@ -64,24 +69,49 @@ import java.lang.Exception
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
-    val authentication by viewModel.authentication.observeAsState(initial = null)
+
+    val signInUIState by viewModel.signInState.collectAsState()
+//    val authentication by viewModel.authentication.observeAsState(initial = null)
     val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
     val coroutineScope = rememberCoroutineScope()
 
-    if (authentication != null) {
-        LaunchedEffect(true)
-        {
-            coroutineScope.launch {
-                authentication!!.token?.let { dataStoreManager.setString("token", it) }
-                authentication!!.user!!.id?.let { it1 -> dataStoreManager.setString("userID", it1) }
-            }
-            navController.navigate(NavDestinations.MAIN_SCREEN)
-            {
-                popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
-            }
-            Log.d("sign in data", authentication.toString())
-        }
 
+//    if (authentication != null) {
+//        LaunchedEffect(true)
+//        {
+//            coroutineScope.launch {
+//                authentication!!.token?.let { dataStoreManager.setString("token", it) }
+//                authentication!!.user!!.id?.let { it1 -> dataStoreManager.setString("userID", it1) }
+//            }
+//            navController.navigate(NavDestinations.MAIN_SCREEN)
+//            {
+//                popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
+//            }
+//            Log.d("sign in data", authentication.toString())
+//        }
+//
+//    }
+
+    viewModel.eventFlow.collectWithLifecycle {
+        when (it) {
+            is Event.ShowToast -> toastHost.show(
+                it.icon,
+                it.text.asString(context)
+            )
+            is Event.SendData -> {
+                onGetCredentials(it["name"], it["email"], it["token"])
+            }
+            is Event.NavigateTo -> {
+                authController.navigate(it.screen)
+            }
+            is Event.NavigateIf -> {
+                if (it.predicate(screenController.currentDestination)) {
+                    screenController.navigate(it.screen)
+                    onTitleChange(Screen.Home.Feed.title)
+                }
+            }
+            else -> {}
+        }
     }
 
     Scaffold {
@@ -170,12 +200,7 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                     text = "Login",
                     onClick = {
                         try {
-                            viewModel.login(
-                                mapOf(
-                                    "username" to username.text,
-                                    "password" to password.text
-                                )
-                            )
+                            viewModel.login(username.text, password.text)
                         } catch (e: Exception) {
                             println(e.message.toString())
                             Log.d("error", e.message.toString())

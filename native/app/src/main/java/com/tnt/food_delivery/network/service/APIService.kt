@@ -1,5 +1,6 @@
 package com.tnt.food_delivery.network.service
 
+import com.tnt.food_delivery.core.utils.constants.Constants.BASE_URL_V1
 import com.tnt.food_delivery.data.response.AuthenticationResponse
 import com.tnt.food_delivery.data.response.UserResponse
 import okhttp3.OkHttpClient
@@ -12,7 +13,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface APIService {
-    @Headers("Content-Type: application/json")
+//    @Headers("Content-Type: application/json")
     @POST("user/login")
     suspend fun login(@Body body: Map<String, String>): Response<AuthenticationResponse>
 
@@ -31,7 +32,7 @@ interface APIService {
                     )
                     .build()
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://192.168.10.170:8080/api/v1/")
+                    .baseUrl(BASE_URL_V1)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build()
