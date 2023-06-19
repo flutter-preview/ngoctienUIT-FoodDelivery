@@ -10,9 +10,9 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface UserRepository extends MongoRepository<User, String> {
-    @Query("{name: {$regex: ?0 }}")
-    List<User> findItemByName(String name);
+    @Query("{ name: { $regex: ?0, $options: 'i' }, userRole: RESTAURANT}")
+    List<User> findRestaurantByName(String name);
 
-    @Query("{'$or':[ {'username': ?0 , 'password': ?1}, {'email': ?0 , 'password': ?1}, {'phoneNumber': ?0 , 'password': ?1} ] }")
+    @Query("{ '$or':[ { 'username': ?0 , 'password': ?1 }, { 'email': ?0 , 'password': ?1 }, { 'phoneNumber': ?0 , 'password': ?1 } ] }")
     User login(String username, String password);
 }

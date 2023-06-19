@@ -32,6 +32,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/restaurant")
+    public ResponseEntity<?> searchRestaurant(@RequestParam String name) {
+        try {
+            return ResponseEntity.ok(userRepository.findRestaurantByName(name));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Không tìm thấy thông tin người dùng");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequestEntity authentication) {
         try {
@@ -76,15 +85,37 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/{id}/block")
+    public ResponseEntity<?> blocUser(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable String id) {
+        try {
+            String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
+//            String userID = content.split("~")[0];
+            String role = content.split("~")[1];
+            if (role.equals("ADMIN")) {
+                User user = userRepository.findById(id).get();
+                user.setStatus(User.UserStatus.BLOCKED);
+                return ResponseEntity.ok(userRepository.save(user));
+            }
+            return ResponseEntity.badRequest().body("Bạn không có quyền khóa tài khoản người dùng này");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@RequestHeader(name = "Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> deleteUser(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable String id) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
             String userID = content.split("~")[0];
             String role = content.split("~")[1];
             if (userID.equals(id) || role.equals("ADMIN")) {
-                userRepository.deleteById(id);
-                return ResponseEntity.ok("ok");
+                User user = userRepository.findById(id).get();
+                user.setStatus(User.UserStatus.DELETED);
+                return ResponseEntity.ok(userRepository.save(user));
             }
             return ResponseEntity.badRequest().body("Bạn không có quyền xóa người dùng này");
         } catch (Exception e) {
@@ -100,7 +131,10 @@ public class UserController {
     // REGISTER
 
     @GetMapping("/register")
-    public ResponseEntity<?> getRegister(@RequestHeader(name = "Authorization") String token, @RequestParam String type, @RequestParam String status) {
+    public ResponseEntity<?> getRegister(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam String type,
+            @RequestParam String status) {
         if (token != null) {
             try {
                 String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
@@ -119,7 +153,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestHeader(name = "Authorization") String token, @RequestBody Register register) {
+    public ResponseEntity<?> register(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody Register register) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
             String userID = content.split("~")[0];
@@ -134,7 +170,9 @@ public class UserController {
     }
 
     @PostMapping("/register/{id}") //id register
-    public ResponseEntity<?> acceptRegister(@RequestHeader(name = "Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> acceptRegister(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable String id) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
 //            String userID = content.split("~")[0];
@@ -159,7 +197,9 @@ public class UserController {
     }
 
     @DeleteMapping("/register/{id}") //id register
-    public ResponseEntity<?> cancelRegister(@RequestHeader(name = "Authorization") String token, @PathVariable String id) {
+    public ResponseEntity<?> cancelRegister(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable String id) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
             String userID = content.split("~")[0];
