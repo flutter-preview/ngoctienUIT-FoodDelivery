@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.presentation.sign_up
+package com.tnt.food_delivery.presentation.sign_up_process
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -7,32 +7,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tnt.food_delivery.core.utils.EventResults
 import com.tnt.food_delivery.core.utils.EventStatus
-import com.tnt.food_delivery.data.response.RegisterResponse
+import com.tnt.food_delivery.data.response.UserResponse
 import com.tnt.food_delivery.network.api.AuthService
 import com.tnt.food_delivery.network.di.NetworkModule
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
-class SignUpViewModel : ViewModel() {
+class SignUpProcessViewModel : ViewModel() {
     private val authService: AuthService = NetworkModule.provideAuthService()
-    private val _register: MutableLiveData<EventResults<RegisterResponse>> =
+    private val _register: MutableLiveData<EventResults<UserResponse>> =
         MutableLiveData(EventResults())
-    val register: LiveData<EventResults<RegisterResponse>> = _register
+    val register: LiveData<EventResults<UserResponse>> = _register
 
-    suspend fun checkRegister(body: Map<String, String>) {
+    suspend fun signup(body: Map<String, String>) {
         Log.d("test", "sign up")
         _register.value = EventResults(status = EventStatus.LOADING)
         viewModelScope.launch {
             try {
-                val data = authService.checkRegister(body)
+                val data = authService.signup(body)
                 if (data.isSuccessful) {
-                    if (data.body()!!.status) {
-                        _register.value =
-                            EventResults(status = EventStatus.SUCCESS, data = data.body())
-                    } else {
-                        _register.value =
-                            EventResults(status = EventStatus.ERROR, error = data.body()!!.message)
-                    }
+                    _register.value =
+                        EventResults(status = EventStatus.SUCCESS, data = data.body())
                     Log.d("data", data.body().toString())
                 } else {
                     val errMsg = data.errorBody()?.string() ?: run { data.code().toString() }

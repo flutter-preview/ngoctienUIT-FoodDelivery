@@ -82,8 +82,8 @@ import java.lang.Exception
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     val state by viewModel.authentication.observeAsState()
     val context = LocalContext.current
     val dataStoreManager = DataStoreManager(context)
@@ -100,8 +100,7 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                         dataStoreManager.setString("userID", id)
                     }
                 }
-                navController.navigate(NavDestinations.MAIN_SCREEN)
-                {
+                navController.navigate(NavDestinations.MAIN_SCREEN) {
                     popUpTo(NavDestinations.SIGNIN_SCREEN) { inclusive = true }
                 }
                 Log.d("sign in data", state!!.data.toString())
@@ -209,8 +208,8 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                         coroutineScope.launch {
                             viewModel.login(
                                 mapOf(
-                                    "username" to username.text,
-                                    "password" to password.text
+                                    "username" to username,
+                                    "password" to password
                                 )
                             )
                         }

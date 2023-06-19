@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.presentation.filter.FilterScreen
 import com.tnt.food_delivery.presentation.home.HomeScreen
 import com.tnt.food_delivery.presentation.message.MessageScreen
 import com.tnt.food_delivery.presentation.notification.NotificationScreen
@@ -51,9 +52,9 @@ import kotlinx.coroutines.launch
 
 val tabs = listOf<Map<String, Any>>(
     mapOf("icon" to R.drawable.icon_restaurant, "title" to "Food"),
-    mapOf("icon" to R.drawable.icon_no_notifiaction, "title" to "Notification"),
-    mapOf("icon" to R.drawable.icon_home_disable, "title" to "Home"),
     mapOf("icon" to R.drawable.icon_chat_disable, "title" to "Chat"),
+    mapOf("icon" to R.drawable.icon_home_disable, "title" to "Home"),
+    mapOf("icon" to R.drawable.icon_no_notifiaction, "title" to "Notification"),
     mapOf("icon" to R.drawable.icon_profile_disable, "title" to "Profile"),
     )
 
@@ -77,16 +78,16 @@ fun MainScreen(navController: NavController) {
                 .fillMaxSize()
         ) {
             HorizontalPager(
-                pageCount = 4,
+                pageCount = 5,
                 modifier = Modifier.fillMaxSize(),
                 state = pagerState,
             ) { index ->
                 when (index) {
                     0 -> HomeScreen(navController)
-                    1 -> NotificationScreen()
+                    1 -> MessageScreen(navController)
                     2 -> UploadPhotoScreen()
-                    3 -> MessageScreen(navController)
-                    4 -> MessageScreen(navController)
+                    3 -> NotificationScreen()
+                    4 -> FilterScreen(navController)
                 }
             }
             Card(

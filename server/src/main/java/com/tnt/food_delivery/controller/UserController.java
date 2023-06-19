@@ -3,7 +3,9 @@ package com.tnt.food_delivery.controller;
 import com.tnt.food_delivery.common.JwtUtils;
 import com.tnt.food_delivery.model.User;
 import com.tnt.food_delivery.model.request.AuthenticationRequestEntity;
+import com.tnt.food_delivery.model.request.CheckRegisterRequest;
 import com.tnt.food_delivery.model.response.AuthenticationResponseEntity;
+import com.tnt.food_delivery.model.response.CheckRegisterResponse;
 import com.tnt.food_delivery.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,24 @@ public class UserController {
             return ResponseEntity.badRequest().body("Tài khoản hoặc mật khẩu chưa chính xác");
         }
 
+    }
+
+    @PostMapping("/check-register")
+    public ResponseEntity<?> checkRegister(@RequestBody CheckRegisterRequest register) {
+        System.out.println("checkRegister");
+        System.out.println(register.getEmail());
+        System.out.println(register.getUsername());
+        try {
+            User user = userRepository.checkRegister(register.getUsername(), register.getEmail());
+            if (user.getEmail().equals(register.getEmail())) {
+                return ResponseEntity.ok().body(new CheckRegisterResponse(false, "Email đã tồn tại"));
+            } else if (user.getUsername().equals(register.getUsername())) {
+                return ResponseEntity.ok().body(new CheckRegisterResponse(false, "Username đã tồn tại"));
+            }
+            return ResponseEntity.ok(new CheckRegisterResponse(false, "Tài khoản đã tồn tại trong hệ thống"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new CheckRegisterResponse(true, "ok"));
+        }
     }
 
     @PostMapping("/signup")

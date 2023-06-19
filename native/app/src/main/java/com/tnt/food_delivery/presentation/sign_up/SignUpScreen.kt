@@ -1,5 +1,6 @@
 package com.tnt.food_delivery.presentation.sign_up
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -30,11 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +44,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.core.components.ShowLoading
+import com.tnt.food_delivery.core.components.showToast
+import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
@@ -53,11 +58,42 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val state by viewModel.authentication.observeAsState()
+    val state by viewModel.register.observeAsState()
+
+    LaunchedEffect(state)
+    {
+        Log.d("check", "ok")
+        when (state!!.status) {
+            EventStatus.SUCCESS -> {
+                navController.navigate("${NavDestinations.SIGNUP_PROCESS_SCREEN}/$username/$email/$password") {
+                    navController.graph.startDestinationRoute?.let { route ->
+                        popUpTo(route) {
+                            saveState = true
+                        }
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+                Log.d("sign in data", state!!.data.toString())
+            }
+
+            EventStatus.LOADING -> {
+                Log.d("Loading", "Loading")
+            }
+
+            EventStatus.ERROR -> {
+                Log.d("Error", state!!.error ?: "Lỗi bất định")
+                showToast(context, state!!.error ?: "Lỗi bất định");
+            }
+
+            else -> {}
+        }
+    }
 
     Scaffold {
         it
@@ -107,7 +143,12 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                         .width(157.dp),
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.signUp(mapOf())
+                            viewModel.checkRegister(
+                                mapOf(
+                                    "username" to username,
+                                    "email" to email
+                                )
+                            )
                         }
                     }
                 )
@@ -127,6 +168,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                     )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
+                if (state!!.status == EventStatus.LOADING) ShowLoading()
             }
         }
     }
@@ -137,8 +179,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
 fun CustomTextField(
     icon: Int,
     placeholder: String,
-    value: TextFieldValue,
-    onValueChange: (value: TextFieldValue) -> Unit
+    value: String,
+    onValueChange: (value: String) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier
