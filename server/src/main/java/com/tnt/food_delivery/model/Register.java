@@ -1,6 +1,7 @@
 package com.tnt.food_delivery.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -22,20 +23,23 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Register {
     @Id
-    String id;
+    private String id;
 
-    @NonNull String userID;
+    @NonNull
+    @DBRef
+    private User userID;
 
-    @NonNull RegisterType type;
-
-    @Builder.Default
-    RegisterStatus status = RegisterStatus.PENDING;
-
-    @Builder.Default
-    String timeRegister = getCurrentTime();
+    @NonNull
+    private RegisterType type;
 
     @Builder.Default
-    String timeUpdate = getCurrentTime();
+    private RegisterStatus status = RegisterStatus.PENDING;
+
+    @Builder.Default
+    private String timeRegister = getCurrentTime();
+
+    @Builder.Default
+    private String timeUpdate = getCurrentTime();
 
     public enum RegisterType {
         DELIVER, RESTAURANT

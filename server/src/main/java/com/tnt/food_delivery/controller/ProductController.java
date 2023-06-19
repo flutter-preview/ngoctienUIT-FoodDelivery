@@ -5,6 +5,7 @@ import com.tnt.food_delivery.model.Product;
 import com.tnt.food_delivery.model.request.ProductRequest;
 import com.tnt.food_delivery.repository.ProductRepository;
 
+import com.tnt.food_delivery.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import static com.tnt.food_delivery.model.Register.getCurrentTime;
 @RestController
 @RequestMapping("api/v1/product")
 public class ProductController {
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     ProductRepository productRepository;
 
@@ -38,12 +41,23 @@ public class ProductController {
     @PostMapping("/")
     public ResponseEntity<?> createProduct(
             @RequestHeader(name = "Authorization") String token,
-            @RequestBody Product product) {
+            @RequestBody ProductRequest productRequest) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
             String userID = content.split("~")[0];
             String role = content.split("~")[1];
-            if (userID.equals(product.getRestaurantID()) && role.equals("RESTAURANT")) {
+            if (userID.equals(productRequest.getRestaurantID()) && role.equals("RESTAURANT")) {
+                Product product = Product.builder()
+                        .restaurantID(userRepository.findById(productRequest.getRestaurantID()).get())
+                        .name(productRequest.getName())
+                        .description(productRequest.getDescription())
+                        .image(productRequest.getImage())
+                        .isSize(productRequest.getIsSize())
+                        .s(productRequest.getS())
+                        .l(productRequest.getL())
+                        .m(productRequest.getM())
+                        .price(productRequest.getPrice())
+                        .build();
                 return ResponseEntity.ok(productRepository.save(product));
             }
             return ResponseEntity.badRequest().body("Bạn không có quyền thay đổi thông tin sản phẩm này");
@@ -52,39 +66,21 @@ public class ProductController {
         }
     }
 
+    //Todo chưa tìm được cách tối ưu update
     @PostMapping("/{id}")
     public ResponseEntity<?> updateProduct(
             @RequestHeader(name = "Authorization") String token,
             @PathVariable String id,
-            @RequestBody ProductRequest newProduct) {
+            @RequestBody ProductRequest productRequest) {
         try {
             String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
             String userID = content.split("~")[0];
             String role = content.split("~")[1];
             Product product = productRepository.findById(id).get();
             if (role.equals("RESTAURANT")
-                    && userID.equals(product.getRestaurantID())
+                    && userID.equals(product.getRestaurantID().getId())
                     && product.getStatus() != Product.ProductStatus.DELETE) {
                 product.setUpdateAt(getCurrentTime());
-                if (newProduct.getName() != null) {
-                    product.setName(newProduct.getName());
-                }
-                if (newProduct.getDescription() != null) {
-                    product.setDescription(newProduct.getDescription());
-                }
-                if (newProduct.getImage() != null) {
-                    product.setImage(newProduct.getImage());
-                }
-                if (newProduct.getIsSize() != null) {
-                    product.setIsSize(newProduct.getIsSize());
-                    if (newProduct.getIsSize()) {
-                        product.setM(newProduct.getM());
-                        product.setL(newProduct.getL());
-                        product.setS(newProduct.getS());
-                    } else {
-                        product.setPrice(newProduct.getPrice());
-                    }
-                }
                 return ResponseEntity.ok(productRepository.save(product));
             }
             return ResponseEntity.badRequest().body("Bạn không có quyền thay đổi thông tin sản phẩm này");
@@ -104,7 +100,7 @@ public class ProductController {
             Product product = productRepository.findById(id).get();
             if (role.equals("ADMIN")
                     || role.equals("RESTAURANT")
-                    && userID.equals(product.getRestaurantID())
+                    && userID.equals(product.getRestaurantID().getId())
                     && product.getStatus() == Product.ProductStatus.CANCEL) {
                 product.setUpdateAt(getCurrentTime());
                 product.setStatus(Product.ProductStatus.LAUNCH);
@@ -127,7 +123,7 @@ public class ProductController {
             Product product = productRepository.findById(id).get();
             if (role.equals("ADMIN")
                     || role.equals("RESTAURANT")
-                    && userID.equals(product.getRestaurantID())
+                    && userID.equals(product.getRestaurantID().getId())
                     && product.getStatus() == Product.ProductStatus.LAUNCH) {
                 product.setUpdateAt(getCurrentTime());
                 product.setStatus(Product.ProductStatus.CANCEL);
@@ -150,7 +146,7 @@ public class ProductController {
             Product product = productRepository.findById(id).get();
             if (role.equals("ADMIN")
                     || role.equals("RESTAURANT")
-                    && userID.equals(product.getRestaurantID())) {
+                    && userID.equals(product.getRestaurantID().getId())) {
                 product.setUpdateAt(getCurrentTime());
                 product.setStatus(Product.ProductStatus.DELETE);
                 return ResponseEntity.ok(productRepository.save(product));

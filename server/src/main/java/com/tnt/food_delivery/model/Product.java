@@ -1,6 +1,7 @@
 package com.tnt.food_delivery.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +24,8 @@ public class Product {
     private String id;
 
     @NonNull
-    private String restaurantID;
+    @DBRef
+    private User restaurantID;
 
     @NonNull
     private String name;
