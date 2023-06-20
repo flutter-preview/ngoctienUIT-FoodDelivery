@@ -1,6 +1,6 @@
-package com.tnt.food_delivery.model.response;
+package com.tnt.food_delivery.data.response;
 
-import com.tnt.food_delivery.model.User;
+import com.tnt.food_delivery.data.model.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

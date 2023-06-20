@@ -1,6 +1,6 @@
-package com.tnt.food_delivery.model.request;
+package com.tnt.food_delivery.data.request;
 
-import com.tnt.food_delivery.model.Register;
+import com.tnt.food_delivery.data.model.Register;
 import lombok.*;
 
 @Getter

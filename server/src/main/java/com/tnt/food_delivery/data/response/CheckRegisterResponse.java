@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model.response;
+package com.tnt.food_delivery.data.response;
 
 import lombok.*;
 

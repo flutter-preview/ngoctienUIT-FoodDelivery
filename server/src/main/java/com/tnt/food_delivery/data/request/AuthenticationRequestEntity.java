@@ -1,9 +1,5 @@
-package com.tnt.food_delivery.model.request;
+package com.tnt.food_delivery.data.request;
 
-import com.mongodb.lang.NonNull;
-
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

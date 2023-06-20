@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model;
+package com.tnt.food_delivery.data.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -27,7 +27,7 @@ public class Register {
 
     @NonNull
     @DBRef
-    private User userID;
+    private User user;
 
     @NonNull
     private RegisterType type;

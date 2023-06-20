@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model;
+package com.tnt.food_delivery.data.model;
 
 import com.mongodb.lang.NonNull;
 
@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -48,6 +50,8 @@ public class User {
     private String wards;
     private String district;
     private String province;
+
+    private List<String> ratings; // chỉ sử dụng cho role RESTAURANT
 
     @Builder.Default
     private UserRole userRole = UserRole.USER;

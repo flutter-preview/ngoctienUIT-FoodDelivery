@@ -1,8 +1,6 @@
-package com.tnt.food_delivery.model;
+package com.tnt.food_delivery.data.model;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
-
-import java.util.List;
 
 public class OrderItem {
     @DBRef

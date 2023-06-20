@@ -1,6 +1,6 @@
 package com.tnt.food_delivery.common;
 
-import com.tnt.food_delivery.model.User;
+import com.tnt.food_delivery.data.model.User;
 
 import java.util.Date;
 

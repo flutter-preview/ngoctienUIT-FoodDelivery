@@ -1,11 +1,15 @@
 package com.tnt.food_delivery.controller;
 
 import com.tnt.food_delivery.common.JwtUtils;
-import com.tnt.food_delivery.model.User;
-import com.tnt.food_delivery.model.request.AuthenticationRequestEntity;
-import com.tnt.food_delivery.model.request.CheckRegisterRequest;
-import com.tnt.food_delivery.model.response.AuthenticationResponseEntity;
-import com.tnt.food_delivery.model.response.CheckRegisterResponse;
+import com.tnt.food_delivery.data.model.Product;
+import com.tnt.food_delivery.data.model.Rating;
+import com.tnt.food_delivery.data.model.User;
+import com.tnt.food_delivery.data.request.AuthenticationRequestEntity;
+import com.tnt.food_delivery.data.request.CheckRegisterRequest;
+import com.tnt.food_delivery.data.request.RatingRequest;
+import com.tnt.food_delivery.data.response.AuthenticationResponseEntity;
+import com.tnt.food_delivery.data.response.CheckRegisterResponse;
+import com.tnt.food_delivery.repository.RatingRepository;
 import com.tnt.food_delivery.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +17,16 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/user")
 public class UserController {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RatingRepository ratingRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequestEntity authentication) {
@@ -138,6 +147,53 @@ public class UserController {
                 return ResponseEntity.ok(userRepository.save(user));
             }
             return ResponseEntity.badRequest().body("Bạn không có quyền xóa người dùng này");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/rating")
+    public ResponseEntity<?> getRatingRestaurant(@PathVariable String id) {
+        try {
+            User user = userRepository.findById(id).get();
+            if (user.getRatings() != null) {
+                return ResponseEntity.ok(ratingRepository.findAllById(user.getRatings()));
+            }
+            return ResponseEntity.ok(new ArrayList<>());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/rating")
+    public ResponseEntity<?> ratingRestaurant(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable String id,
+            @RequestBody RatingRequest ratingRequest) {
+        try {
+            String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
+            String userID = content.split("~")[0];
+            String role = content.split("~")[1];
+            User user = userRepository.findById(id).get();
+            Rating myRating = Rating.builder()
+                    .rate(ratingRequest.getRate())
+                    .comment(ratingRequest.getComment())
+                    .user(userRepository.findById(userID).get())
+                    .build();
+            Rating rating = ratingRepository.save(myRating);
+            if (role.equals("USER")
+                    && user.getStatus() == User.UserStatus.ACTIVATED) {
+                List<String> ratings;
+                if (user.getRatings() != null) {
+                    ratings = user.getRatings();
+                } else {
+                    ratings = new ArrayList<>();
+                }
+                ratings.add(rating.getId());
+                user.setRatings(ratings);
+                return ResponseEntity.ok(userRepository.save(user));
+            }
+            return ResponseEntity.badRequest().body("Bạn không có quyền rating nhà hàng này");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -1,8 +1,7 @@
 package com.tnt.food_delivery.repository;
 
 
-import com.tnt.food_delivery.model.User;
-import com.tnt.food_delivery.model.request.AuthenticationRequestEntity;
+import com.tnt.food_delivery.data.model.User;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model.request;
+package com.tnt.food_delivery.data.request;
 
 import lombok.*;
 
@@ -17,7 +17,6 @@ public class ProductRequest {
     @NonNull
     private String description;
 
-    @Builder.Default
     private Boolean isSize = false;
 
     private Long price;

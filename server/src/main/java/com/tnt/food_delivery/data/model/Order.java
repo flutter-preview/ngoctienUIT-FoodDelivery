@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model;
+package com.tnt.food_delivery.data.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tnt.food_delivery.model.Register.getCurrentTime;
+import static com.tnt.food_delivery.data.model.Register.getCurrentTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -22,7 +22,7 @@ public class Order {
 
     @NonNull
     @DBRef
-    private User userID;
+    private User user;
 
     @Builder.Default
     private String createAt = getCurrentTime();

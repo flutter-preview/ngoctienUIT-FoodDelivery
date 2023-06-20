@@ -1,6 +1,6 @@
 package com.tnt.food_delivery.repository;
 
-import com.tnt.food_delivery.model.Register;
+import com.tnt.food_delivery.data.model.Register;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

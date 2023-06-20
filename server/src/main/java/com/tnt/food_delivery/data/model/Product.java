@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.model;
+package com.tnt.food_delivery.data.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -11,7 +11,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import static com.tnt.food_delivery.model.Register.getCurrentTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.tnt.food_delivery.data.model.Register.getCurrentTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -25,7 +28,7 @@ public class Product {
 
     @NonNull
     @DBRef
-    private User restaurantID;
+    private User restaurant;
 
     @NonNull
     private String name;
@@ -47,6 +50,9 @@ public class Product {
 
     @Builder.Default
     String updateAt = getCurrentTime();
+
+    @Builder.Default
+    private List<String> ratings = new ArrayList<>();
 
     private Long price;
     private Long s;

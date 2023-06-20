@@ -1,9 +1,9 @@
 package com.tnt.food_delivery.controller;
 
 import com.tnt.food_delivery.common.JwtUtils;
-import com.tnt.food_delivery.model.Register;
-import com.tnt.food_delivery.model.User;
-import com.tnt.food_delivery.model.request.RegisterRequest;
+import com.tnt.food_delivery.data.model.Register;
+import com.tnt.food_delivery.data.model.User;
+import com.tnt.food_delivery.data.request.RegisterRequest;
 import com.tnt.food_delivery.repository.RegisterRepository;
 import com.tnt.food_delivery.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class RegisterController {
             String role = content.split("~")[1];
             if (userID.equals(registerRequest.getUserID()) && role.equals("USER") || role.equals("ADMIN")) {
                 Register register = Register.builder()
-                        .userID(userRepository.findById(registerRequest.getUserID()).get())
+                        .user(userRepository.findById(registerRequest.getUserID()).get())
                         .type(registerRequest.getType())
                         .build();
                 return ResponseEntity.ok(registerRepository.save(register));
@@ -71,7 +71,7 @@ public class RegisterController {
             String role = content.split("~")[1];
             Register register = registerRepository.findById(id).get();
             if (role.equals("ADMIN")) {
-                User user = register.getUserID();
+                User user = register.getUser();
                 if (register.getType() == Register.RegisterType.RESTAURANT) {
                     user.setUserRole(User.UserRole.RESTAURANT);
                 } else {
@@ -97,7 +97,7 @@ public class RegisterController {
             String userID = content.split("~")[0];
             String role = content.split("~")[1];
             Register register = registerRepository.findById(id).get();
-            if (userID.equals(register.getUserID().getId()) && role.equals("USER") || role.equals("ADMIN")) {
+            if (userID.equals(register.getUser().getId()) && role.equals("USER") || role.equals("ADMIN")) {
                 register.setStatus(Register.RegisterStatus.CANCEL);
                 register.setTimeUpdate(Register.getCurrentTime());
                 return ResponseEntity.ok(registerRepository.save(register));
