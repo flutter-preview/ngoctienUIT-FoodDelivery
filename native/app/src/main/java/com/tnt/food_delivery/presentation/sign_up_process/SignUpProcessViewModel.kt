@@ -18,7 +18,7 @@ class SignUpProcessViewModel : ViewModel() {
         MutableLiveData(EventResults())
     val register: LiveData<EventResults<UserResponse>> = _register
 
-    suspend fun signup(body: Map<String, String>) {
+    suspend fun signup(body: Map<String, Any>) {
         Log.d("test", "sign up")
         _register.value = EventResults(status = EventStatus.LOADING)
         viewModelScope.launch {

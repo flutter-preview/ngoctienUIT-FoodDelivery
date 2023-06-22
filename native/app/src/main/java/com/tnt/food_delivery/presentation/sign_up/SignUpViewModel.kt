@@ -10,6 +10,7 @@ import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.data.response.RegisterResponse
 import com.tnt.food_delivery.network.api.AuthService
 import com.tnt.food_delivery.network.di.NetworkModule
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -29,6 +30,8 @@ class SignUpViewModel : ViewModel() {
                     if (data.body()!!.status) {
                         _register.value =
                             EventResults(status = EventStatus.SUCCESS, data = data.body())
+                        delay(1000)
+                        _register.value = EventResults()
                     } else {
                         _register.value =
                             EventResults(status = EventStatus.ERROR, error = data.body()!!.message)

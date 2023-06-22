@@ -1,6 +1,7 @@
 package com.tnt.food_delivery.network.di
 
 import com.tnt.food_delivery.network.api.AuthService
+import com.tnt.food_delivery.network.api.RestaurantService
 import com.tnt.food_delivery.network.api.UserApi
 import javax.inject.Singleton
 
@@ -13,4 +14,8 @@ object NetworkModule {
 
     @Singleton
     fun provideAuthService(): AuthService = retrofit.create(AuthService::class.java)
+
+    @Singleton
+    fun provideRestaurantService(): RestaurantService =
+        retrofit.create(RestaurantService::class.java)
 }

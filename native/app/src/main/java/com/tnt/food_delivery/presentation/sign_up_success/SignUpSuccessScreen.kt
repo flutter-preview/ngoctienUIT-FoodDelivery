@@ -34,7 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
@@ -42,7 +45,7 @@ import com.tnt.food_delivery.ui.theme.Viga
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
-fun SignUpSuccessScreen() {
+fun SignUpSuccessScreen(navController: NavController) {
     Scaffold {
         it
         Box {
@@ -57,7 +60,9 @@ fun SignUpSuccessScreen() {
             ) {
                 Spacer(modifier = Modifier.fillMaxHeight(fraction = 0.25f))
                 Image(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 100.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 100.dp),
                     painter = painterResource(id = R.drawable.success_icon),
                     contentDescription = "tnt"
                 )
@@ -78,9 +83,18 @@ fun SignUpSuccessScreen() {
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(50.dp))
-                GradientButton(modifier = Modifier
-                    .height(56.dp)
-                    .width(157.dp), text = "Try Order", onClick = {})
+                GradientButton(
+                    modifier = Modifier
+                        .height(56.dp)
+                        .width(157.dp),
+                    text = "Go To Sign In",
+                    onClick = {
+                        navController.navigate(NavDestinations.SIGNIN_SCREEN) {
+                            launchSingleTop = true
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                )
             }
         }
     }
@@ -90,6 +104,6 @@ fun SignUpSuccessScreen() {
 @Composable
 fun SignUpSuccessPreview() {
     FoodDeliveryTheme {
-        SignUpSuccessScreen()
+        SignUpSuccessScreen(rememberNavController())
     }
 }

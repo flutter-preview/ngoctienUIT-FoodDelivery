@@ -13,7 +13,7 @@ interface AuthService {
     suspend fun login(@Body body: Map<String, String>): Response<AuthenticationResponse>
 
     @POST("user/signup")
-    suspend fun signup(@Body body: Map<String, String>): Response<UserResponse>
+    suspend fun signup(@Body body: @JvmSuppressWildcards Map<String, Any>): Response<UserResponse>
 
     @POST("user/check-register")
     suspend fun checkRegister(@Body body: Map<String, String>): Response<RegisterResponse>

@@ -24,11 +24,15 @@ public class User {
     @Id
     private String id;
 
+    @NonNull
     private String name;
 
     @Builder.Default
     private Boolean isMale = true;
+
     private String birthOfDate;
+
+    private String avatar;
 
     @NonNull
     @Indexed(unique = true)

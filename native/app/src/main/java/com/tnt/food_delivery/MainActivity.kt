@@ -1,6 +1,7 @@
 package com.tnt.food_delivery
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import com.tnt.food_delivery.presentation.main.MainScreen
 import com.tnt.food_delivery.presentation.sign_in.SignInScreen
 import com.tnt.food_delivery.presentation.sign_up.SignUpScreen
 import com.tnt.food_delivery.presentation.sign_up_process.SignUpProcessScreen
+import com.tnt.food_delivery.presentation.sign_up_success.SignUpSuccessScreen
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContent { MyApp() }
     }
 }
@@ -72,6 +75,9 @@ fun MyApp() {
                             password = password
                         )
                     }
+                }
+                composable(NavDestinations.SIGNUP_SUCCESS_SCREEN) {
+                    SignUpSuccessScreen(navController)
                 }
                 composable(NavDestinations.MAIN_SCREEN) {
                     MainScreen(navController)

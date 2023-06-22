@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.core.components.ShowLoading
 import com.tnt.food_delivery.core.components.showToast
+import com.tnt.food_delivery.core.utils.EventResults
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
@@ -58,9 +62,9 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.register.observeAsState()
@@ -72,14 +76,12 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
             EventStatus.SUCCESS -> {
                 navController.navigate("${NavDestinations.SIGNUP_PROCESS_SCREEN}/$username/$email/$password") {
                     navController.graph.startDestinationRoute?.let { route ->
-                        popUpTo(route) {
-                            saveState = true
-                        }
+                        popUpTo(route) { saveState = true }
                     }
                     launchSingleTop = true
                     restoreState = true
                 }
-                Log.d("sign in data", state!!.data.toString())
+                Log.d("sign up data", state!!.data.toString())
             }
 
             EventStatus.LOADING -> {
@@ -201,10 +203,11 @@ fun CustomTextField(
         onValueChange = onValueChange,
         placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B).copy(alpha = 0.3f)) },
         shape = RoundedCornerShape(30),
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         leadingIcon = {
             Image(
-                modifier = Modifier
-                    .height(30.dp),
+                modifier = Modifier.height(30.dp),
                 painter = painterResource(id = icon),
                 contentDescription = "icon profile",
             )

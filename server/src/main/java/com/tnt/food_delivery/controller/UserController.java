@@ -7,6 +7,7 @@ import com.tnt.food_delivery.data.model.User;
 import com.tnt.food_delivery.data.request.AuthenticationRequestEntity;
 import com.tnt.food_delivery.data.request.CheckRegisterRequest;
 import com.tnt.food_delivery.data.request.RatingRequest;
+import com.tnt.food_delivery.data.request.UserRequest;
 import com.tnt.food_delivery.data.response.AuthenticationResponseEntity;
 import com.tnt.food_delivery.data.response.CheckRegisterResponse;
 import com.tnt.food_delivery.repository.RatingRepository;
@@ -37,14 +38,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Tài khoản hoặc mật khẩu chưa chính xác");
         }
-
     }
 
     @PostMapping("/check-register")
     public ResponseEntity<?> checkRegister(@RequestBody CheckRegisterRequest register) {
-        System.out.println("checkRegister");
-        System.out.println(register.getEmail());
-        System.out.println(register.getUsername());
         try {
             User user = userRepository.checkRegister(register.getUsername(), register.getEmail());
             if (user.getEmail().equals(register.getEmail())) {
@@ -54,15 +51,24 @@ public class UserController {
             }
             return ResponseEntity.ok(new CheckRegisterResponse(false, "Tài khoản đã tồn tại trong hệ thống"));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.ok(new CheckRegisterResponse(true, "ok"));
         }
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody User user) {
+    public ResponseEntity<?> signup(@RequestBody UserRequest userRequest) {
         try {
-            User myUser = userRepository.save(user);
-            return ResponseEntity.ok(myUser);
+            User myUser = User.builder()
+                    .isMale(userRequest.getIsMale())
+                    .name(userRequest.getName())
+                    .phoneNumber(userRequest.getPhoneNumber())
+                    .email(userRequest.getEmail())
+                    .birthOfDate(userRequest.getBirthOfDate())
+                    .password(userRequest.getPassword())
+                    .username(userRequest.getUsername())
+                    .build();
+            return ResponseEntity.ok(userRepository.save(myUser));
         } catch (DuplicateKeyException e) {
             int length = e.toString().split(":").length;
             String error = (e.toString().split(":")[length - 3]).split(" ")[1] + " is duplicated";
@@ -86,12 +92,21 @@ public class UserController {
         }
     }
 
+//    @GetMapping("/restaurant")
+//    public ResponseEntity<?> getAllRestaurant() {
+//        try {
+//            return ResponseEntity.ok(userRepository.getAllRestaurant());
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body("Không tìm thấy thông tin nhà hàng");
+//        }
+//    }
+
     @GetMapping("/restaurant")
     public ResponseEntity<?> searchRestaurant(@RequestParam String name) {
         try {
             return ResponseEntity.ok(userRepository.findRestaurantByName(name));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Không tìm thấy thông tin người dùng");
+            return ResponseEntity.badRequest().body("Không tìm thấy thông tin nhà hàng");
         }
     }
 

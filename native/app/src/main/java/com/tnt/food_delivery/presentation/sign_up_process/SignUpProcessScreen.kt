@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,9 +70,11 @@ fun SignUpProcessScreen(
         Log.d("check", "ok")
         when (state!!.status) {
             EventStatus.SUCCESS -> {
-                navController.navigate(NavDestinations.SIGNIN_SCREEN) {
+                navController.navigate(NavDestinations.SIGNUP_SUCCESS_SCREEN) {
+                    launchSingleTop = true
+                    popUpTo(0) { inclusive = true }
                 }
-                Log.d("sign in data", state!!.data.toString())
+                Log.d("sign up process data", state!!.data.toString())
             }
 
             EventStatus.LOADING -> {
@@ -144,12 +148,13 @@ fun SignUpProcessScreen(
                             coroutineScope.launch {
                                 viewModel.signup(
                                     mapOf(
-                                        "firstName" to firstname,
-                                        "lastName" to lastname,
+                                        "name" to "$firstname $lastname",
                                         "password" to password,
                                         "username" to username,
                                         "email" to email,
-                                        "phoneNumber" to phoneNumber
+                                        "phoneNumber" to phoneNumber,
+                                        "isMale" to true,
+                                        "birthOfDate" to ""
                                     )
                                 )
                             }
@@ -182,6 +187,8 @@ fun CustomTextField(value: String, onValueChange: (value: String) -> Unit, hintT
         onValueChange = onValueChange,
         placeholder = { Text(text = hintText, color = Color(0xFF3B3B3B)) },
         shape = RoundedCornerShape(22),
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
     )
 }
 

@@ -12,6 +12,9 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{ name: { $regex: ?0, $options: 'i' }, userRole: RESTAURANT}")
     List<User> findRestaurantByName(String name);
 
+    @Query("{ userRole: RESTAURANT }")
+    List<User> getAllRestaurant();
+
     @Query("{ '$or':[ { 'username': ?0 , 'password': ?1 }, { 'email': ?0 , 'password': ?1 }, { 'phoneNumber': ?0 , 'password': ?1 } ] }")
     User login(String username, String password);
 
