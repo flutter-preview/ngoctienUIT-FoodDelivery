@@ -1,5 +1,12 @@
 package com.tnt.food_delivery.presentation.restaurant_detail
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,16 +25,20 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
@@ -44,47 +55,119 @@ import com.tnt.food_delivery.presentation.restaurant_detail.components.IconResta
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ProductItem
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ReviewItem
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun RestaurantDetailScreen(navController: NavController) {
-    Scaffold {
-        it
-        Box(modifier = Modifier.fillMaxSize())
-        {
-            Image(
-                modifier = Modifier
-                    .fillMaxHeight(0.6f)
-                    .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.restaurant_img),
-                contentDescription = "restaurant",
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-            Card(
-                modifier = Modifier
-                    .fillMaxHeight(0.6f)
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+    val state = rememberCollapsingToolbarScaffoldState()
+    var visible by remember { mutableStateOf(true) }
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.6f),
+            painter = painterResource(id = R.drawable.restaurant_img),
+            contentDescription = "restaurant",
+            contentScale = ContentScale.FillBounds,
+            alignment = Alignment.TopCenter
+        )
+        CollapsingToolbarScaffold(
+            modifier = Modifier,
+            state = state,
+            scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
+            toolbar = {
+                visible = state.toolbarState.progress == 0.0f
+
+                Box(
+                    modifier = Modifier
+                        .background(if (state.toolbarState.progress == 0.0f) Color.White else Color.Transparent)
+                        .fillMaxWidth()
+                        .height((configuration.screenHeightDp * 0.4).dp)
+                        .pin()
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(57.dp)
+                        .road(Alignment.TopCenter, Alignment.TopCenter),
                 ) {
-                    Card(
+                    AnimatedVisibility(
                         modifier = Modifier
-                            .padding(top = 18.dp)
-                            .width(60.dp)
-                            .height(8.dp),
-                        shape = RoundedCornerShape(90),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF6ED))
-                    ) { }
+                            .align(Alignment.Center)
+                            .padding(horizontal = 55.dp),
+                        visible = visible,
+                        enter = slideInVertically {
+                            with(density) { -40.dp.roundToPx() }
+                        } + expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
+                        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+                    ) {
+                        Text(
+                            text = "Wijie Bar and Resto",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF09051C),
+                            fontSize = 20.sp
+                        )
+                    }
+                    BackButton(
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .align(Alignment.CenterStart)
+                            .padding(start = 5.dp),
+                        backgroundColor = if (state.toolbarState.progress == 0.0f) Color.Transparent
+                        else Color.White.copy(0.55f)
+                    ) {
+
+                    }
                 }
-                LazyColumn {
-                    item {
-                        Column(modifier = Modifier.padding(horizontal = 30.dp)) {
+            }
+        ) {
+            LazyColumn {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxSize(),
+                        shape = RoundedCornerShape(
+                            topStart = if (state.toolbarState.progress == 0.0f) 0.dp else 35.dp,
+                            topEnd = if (state.toolbarState.progress == 0.0f) 0.dp else 35.dp
+                        ),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        if (state.toolbarState.progress != 0.0f)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .padding(top = 18.dp)
+                                        .width(60.dp)
+                                        .height(8.dp),
+                                    shape = RoundedCornerShape(90),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color(0xFFFEF6ED)
+                                    )
+                                ) { }
+                            }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(0.6f)
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .background(Color.White)
+                                .padding(horizontal = 30.dp)
+                        ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -172,7 +255,7 @@ fun RestaurantDetailScreen(navController: NavController) {
                             }
                         }
                         Spacer(modifier = Modifier.height(15.dp))
-                        LazyRow() {
+                        LazyRow {
                             items(10) { index ->
                                 ProductItem(index == 0)
                             }
@@ -187,14 +270,11 @@ fun RestaurantDetailScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                     }
-                    items(10) { index ->
-                        ReviewItem()
-                    }
+                }
+                items(10) { index ->
+                    ReviewItem()
                 }
             }
-//            BackButton {
-//
-//            }
         }
     }
 }
