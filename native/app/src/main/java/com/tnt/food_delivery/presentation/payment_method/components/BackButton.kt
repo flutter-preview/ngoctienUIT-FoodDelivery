@@ -1,6 +1,5 @@
 package com.tnt.food_delivery.presentation.payment_method.components
 
-import android.text.style.BackgroundColorSpan
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height

@@ -1,6 +1,12 @@
 package com.tnt.food_delivery.presentation.restaurant_detail
 
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,12 +28,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
@@ -52,7 +63,9 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 @Composable
 fun RestaurantDetailScreen(navController: NavController) {
     val state = rememberCollapsingToolbarScaffoldState()
+    var visible by remember { mutableStateOf(true) }
     val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -71,6 +84,8 @@ fun RestaurantDetailScreen(navController: NavController) {
             state = state,
             scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
             toolbar = {
+                visible = state.toolbarState.progress == 0.0f
+
                 Box(
                     modifier = Modifier
                         .background(if (state.toolbarState.progress == 0.0f) Color.White else Color.Transparent)
@@ -79,29 +94,39 @@ fun RestaurantDetailScreen(navController: NavController) {
                         .pin()
                 )
 
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(57.dp)
                         .road(Alignment.TopCenter, Alignment.TopCenter),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    Spacer(modifier = Modifier.width(5.dp))
+                    AnimatedVisibility(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 55.dp),
+                        visible = visible,
+                        enter = slideInVertically {
+                            with(density) { -40.dp.roundToPx() }
+                        } + expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
+                        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+                    ) {
+                        Text(
+                            text = "Wijie Bar and Resto",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF09051C),
+                            fontSize = 20.sp
+                        )
+                    }
                     BackButton(
-                        modifier = Modifier.padding(0.dp),
-                        backgroundColor = if (state.toolbarState.progress == 0.0f) Color.Transparent else Color.White.copy(0.55f)
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .align(Alignment.CenterStart)
+                            .padding(start = 5.dp),
+                        backgroundColor = if (state.toolbarState.progress == 0.0f) Color.Transparent
+                        else Color.White.copy(0.55f)
                     ) {
 
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "Wijie Bar and Resto",
-                        fontWeight = FontWeight.Bold,
-                        color = if (state.toolbarState.progress == 0.0f) Color(0xFF09051C) else Color.Transparent,
-                        fontSize = 20.sp
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         ) {
@@ -230,7 +255,7 @@ fun RestaurantDetailScreen(navController: NavController) {
                             }
                         }
                         Spacer(modifier = Modifier.height(15.dp))
-                        LazyRow() {
+                        LazyRow {
                             items(10) { index ->
                                 ProductItem(index == 0)
                             }
