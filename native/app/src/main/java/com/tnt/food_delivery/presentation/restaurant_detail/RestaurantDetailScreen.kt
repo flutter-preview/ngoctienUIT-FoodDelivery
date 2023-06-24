@@ -1,5 +1,6 @@
 package com.tnt.food_delivery.presentation.restaurant_detail
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
@@ -44,47 +44,105 @@ import com.tnt.food_delivery.presentation.restaurant_detail.components.IconResta
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ProductItem
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ReviewItem
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun RestaurantDetailScreen(navController: NavController) {
-    Scaffold {
-        it
-        Box(modifier = Modifier.fillMaxSize())
-        {
-            Image(
-                modifier = Modifier
-                    .fillMaxHeight(0.6f)
-                    .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.restaurant_img),
-                contentDescription = "restaurant",
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-            Card(
-                modifier = Modifier
-                    .fillMaxHeight(0.6f)
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
+    val state = rememberCollapsingToolbarScaffoldState()
+    val configuration = LocalConfiguration.current
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.6f),
+            painter = painterResource(id = R.drawable.restaurant_img),
+            contentDescription = "restaurant",
+            contentScale = ContentScale.FillBounds,
+            alignment = Alignment.TopCenter
+        )
+        CollapsingToolbarScaffold(
+            modifier = Modifier,
+            state = state,
+            scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
+            toolbar = {
+                Box(
+                    modifier = Modifier
+                        .background(if (state.toolbarState.progress == 0.0f) Color.White else Color.Transparent)
+                        .fillMaxWidth()
+                        .height((configuration.screenHeightDp * 0.4).dp)
+                        .pin()
+                )
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(57.dp)
+                        .road(Alignment.TopCenter, Alignment.TopCenter),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(top = 18.dp)
-                            .width(60.dp)
-                            .height(8.dp),
-                        shape = RoundedCornerShape(90),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF6ED))
-                    ) { }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    BackButton(
+                        modifier = Modifier.padding(0.dp),
+                        backgroundColor = if (state.toolbarState.progress == 0.0f) Color.Transparent else Color.White.copy(0.55f)
+                    ) {
+
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "Wijie Bar and Resto",
+                        fontWeight = FontWeight.Bold,
+                        color = if (state.toolbarState.progress == 0.0f) Color(0xFF09051C) else Color.Transparent,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
                 }
-                LazyColumn {
-                    item {
-                        Column(modifier = Modifier.padding(horizontal = 30.dp)) {
+            }
+        ) {
+            LazyColumn {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxSize(),
+                        shape = RoundedCornerShape(
+                            topStart = if (state.toolbarState.progress == 0.0f) 0.dp else 35.dp,
+                            topEnd = if (state.toolbarState.progress == 0.0f) 0.dp else 35.dp
+                        ),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        if (state.toolbarState.progress != 0.0f)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .padding(top = 18.dp)
+                                        .width(60.dp)
+                                        .height(8.dp),
+                                    shape = RoundedCornerShape(90),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color(0xFFFEF6ED)
+                                    )
+                                ) { }
+                            }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(0.6f)
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .background(Color.White)
+                                .padding(horizontal = 30.dp)
+                        ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -187,14 +245,11 @@ fun RestaurantDetailScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                     }
-                    items(10) { index ->
-                        ReviewItem()
-                    }
+                }
+                items(10) { index ->
+                    ReviewItem()
                 }
             }
-//            BackButton {
-//
-//            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.tnt.food_delivery.presentation.restaurant_detail.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import com.tnt.food_delivery.presentation.sign_in.components.shadow
 fun ReviewItem() {
     Card(
         modifier = Modifier
+            .background(Color.White)
             .padding(bottom = 20.dp)
             .fillMaxWidth()
             .height(130.dp)
