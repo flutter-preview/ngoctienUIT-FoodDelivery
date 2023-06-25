@@ -59,7 +59,6 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.gson.Gson
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.data.nav_type.ProductParcelable
 import com.tnt.food_delivery.data.response.ProductResponse
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.payment_method.components.BackButton
@@ -72,27 +71,27 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
-class ProductNavType : NavType<ProductParcelable>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): ProductParcelable? {
+class ProductNavType : NavType<ProductResponse>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): ProductResponse? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, ProductParcelable::class.java)
+            bundle.getParcelable(key, ProductResponse::class.java)
         } else {
             @Suppress("DEPRECATION") bundle.getParcelable(key)
         }
     }
 
-    override fun parseValue(value: String): ProductParcelable {
-        return Gson().fromJson(value, ProductParcelable::class.java)
+    override fun parseValue(value: String): ProductResponse {
+        return Gson().fromJson(value, ProductResponse::class.java)
     }
 
-    override fun put(bundle: Bundle, key: String, value: ProductParcelable) {
+    override fun put(bundle: Bundle, key: String, value: ProductResponse) {
         bundle.putParcelable(key, value)
     }
 }
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-fun ProductDetailScreen(navController: NavController, product: ProductParcelable) {
+fun ProductDetailScreen(navController: NavController, product: ProductResponse) {
     val state = rememberCollapsingToolbarScaffoldState()
     var visible by remember { mutableStateOf(true) }
     val configuration = LocalConfiguration.current
@@ -343,6 +342,6 @@ fun ProductDetailScreen(navController: NavController, product: ProductParcelable
 @Composable
 fun RestaurantDetailPreview() {
     FoodDeliveryTheme {
-        ProductDetailScreen(rememberNavController(), ProductParcelable())
+        ProductDetailScreen(rememberNavController(), ProductResponse())
     }
 }

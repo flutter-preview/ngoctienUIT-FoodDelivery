@@ -19,7 +19,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.tnt.food_delivery.core.utils.NavDestinations
-import com.tnt.food_delivery.data.nav_type.ProductParcelable
 import com.tnt.food_delivery.data.response.ProductResponse
 import com.tnt.food_delivery.presentation.filter.FilterScreen
 import com.tnt.food_delivery.presentation.main.MainScreen
@@ -102,10 +101,10 @@ fun MyApp() {
                     val product = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         backStackEntry.arguments?.getParcelable(
                             "product",
-                            ProductParcelable::class.java
+                            ProductResponse::class.java
                         )
                     } else {
-                        @Suppress("DEPRECATION") backStackEntry.arguments?.getParcelable<ProductParcelable>(
+                        @Suppress("DEPRECATION") backStackEntry.arguments?.getParcelable(
                             "product"
                         )
                     }

@@ -1,7 +1,10 @@
 package com.tnt.food_delivery.data.response
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class UserResponse(
     @field:SerializedName("id")
     val id: String? = null,
@@ -50,4 +53,4 @@ data class UserResponse(
 
     @field:SerializedName("status")
     val status: String = "ACTIVATED",
-)
+): Parcelable

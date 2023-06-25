@@ -53,7 +53,6 @@ import com.tnt.food_delivery.R
 import com.tnt.food_delivery.core.utils.EventResults
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
-import com.tnt.food_delivery.data.nav_type.ProductParcelable
 import com.tnt.food_delivery.data.response.ProductResponse
 import com.tnt.food_delivery.data.response.UserResponse
 import com.tnt.food_delivery.presentation.sign_in.components.shadow
@@ -318,9 +317,8 @@ fun ShowListProduct(navController: NavController, products: EventResults<List<Pr
                             .height(90.dp)
                             .fillMaxWidth()
                             .clickable {
-                                Log.d("click","ok")
-                                val product = ProductParcelable.fromProductResponse(products.data[index])
-                                navController.navigate("${NavDestinations.PRODUCT_DETAIL_SCREEN}/$product") {
+//                                val product = ProductParcelable.fromProductResponse(products.data[index])
+                                navController.navigate("${NavDestinations.PRODUCT_DETAIL_SCREEN}/${products.data[index]}") {
                                     navController.graph.startDestinationRoute?.let { route ->
                                         popUpTo(route) { saveState = true }
                                     }
