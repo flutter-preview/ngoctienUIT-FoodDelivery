@@ -1,7 +1,12 @@
 package com.tnt.food_delivery.data.response
 
+import android.net.Uri
+import android.os.Parcelable
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class ProductResponse(
     @field:SerializedName("id")
     val id: String? = null,
@@ -41,4 +46,8 @@ data class ProductResponse(
 
     @field:SerializedName("l")
     val l: Long? = null,
-)
+) : Parcelable {
+    override fun toString(): String {
+        return Uri.encode(Gson().toJson(this))
+    }
+}
