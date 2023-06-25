@@ -1,5 +1,7 @@
 package com.tnt.food_delivery.presentation.product_detail
 
+import android.os.Build
+import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -25,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -49,8 +53,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
+import com.google.gson.Gson
 import com.tnt.food_delivery.R
+import com.tnt.food_delivery.data.nav_type.ProductParcelable
+import com.tnt.food_delivery.data.response.ProductResponse
 import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
 import com.tnt.food_delivery.presentation.payment_method.components.BackButton
 import com.tnt.food_delivery.presentation.restaurant_detail.CustomItem
@@ -62,9 +72,27 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
+class ProductNavType : NavType<ProductParcelable>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): ProductParcelable? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, ProductParcelable::class.java)
+        } else {
+            @Suppress("DEPRECATION") bundle.getParcelable(key)
+        }
+    }
+
+    override fun parseValue(value: String): ProductParcelable {
+        return Gson().fromJson(value, ProductParcelable::class.java)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: ProductParcelable) {
+        bundle.putParcelable(key, value)
+    }
+}
+
 @OptIn(ExperimentalTextApi::class)
 @Composable
-fun ProductDetailScreen(navController: NavController) {
+fun ProductDetailScreen(navController: NavController, product: ProductParcelable) {
     val state = rememberCollapsingToolbarScaffoldState()
     var visible by remember { mutableStateOf(true) }
     val configuration = LocalConfiguration.current
@@ -73,15 +101,27 @@ fun ProductDetailScreen(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Image(
+        SubcomposeAsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.6f),
-            painter = painterResource(id = R.drawable.restaurant_img),
-            contentDescription = "restaurant",
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(product.image)
+                .crossfade(true)
+                .build(),
+            loading = { CircularProgressIndicator() },
+            contentDescription = "image",
             contentScale = ContentScale.FillBounds,
-            alignment = Alignment.TopCenter
         )
+//        Image(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .fillMaxHeight(0.6f),
+//            painter = painterResource(id = R.drawable.restaurant_img),
+//            contentDescription = "restaurant",
+//            contentScale = ContentScale.FillBounds,
+//            alignment = Alignment.TopCenter
+//        )
         CollapsingToolbarScaffold(
             modifier = Modifier,
             state = state,
@@ -130,7 +170,7 @@ fun ProductDetailScreen(navController: NavController) {
                         backgroundColor = if (state.toolbarState.progress == 0.0f) Color.Transparent
                         else Color.White.copy(0.55f)
                     ) {
-
+                        navController.popBackStack()
                     }
                 }
             }
@@ -303,6 +343,6 @@ fun ProductDetailScreen(navController: NavController) {
 @Composable
 fun RestaurantDetailPreview() {
     FoodDeliveryTheme {
-        ProductDetailScreen(rememberNavController())
+        ProductDetailScreen(rememberNavController(), ProductParcelable())
     }
 }

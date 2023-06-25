@@ -1,5 +1,6 @@
 package com.tnt.food_delivery
 
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -19,8 +19,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.tnt.food_delivery.core.utils.NavDestinations
+import com.tnt.food_delivery.data.nav_type.ProductParcelable
+import com.tnt.food_delivery.data.response.ProductResponse
 import com.tnt.food_delivery.presentation.filter.FilterScreen
 import com.tnt.food_delivery.presentation.main.MainScreen
+import com.tnt.food_delivery.presentation.product_detail.ProductDetailScreen
+import com.tnt.food_delivery.presentation.product_detail.ProductNavType
+import com.tnt.food_delivery.presentation.restaurant_detail.RestaurantDetailScreen
 import com.tnt.food_delivery.presentation.sign_in.SignInScreen
 import com.tnt.food_delivery.presentation.sign_up.SignUpScreen
 import com.tnt.food_delivery.presentation.sign_up_process.SignUpProcessScreen
@@ -84,6 +89,29 @@ fun MyApp() {
                 }
                 composable(NavDestinations.FILTER_SCREEN) {
                     FilterScreen(navController)
+                }
+                composable(NavDestinations.RESTAURANT_DETAIL_SCREEN) {
+                    RestaurantDetailScreen(navController)
+                }
+                composable(
+                    "${NavDestinations.PRODUCT_DETAIL_SCREEN}/{product}",
+                    arguments = listOf(
+                        navArgument("product") { type = ProductNavType() },
+                    )
+                ) { backStackEntry ->
+                    val product = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        backStackEntry.arguments?.getParcelable(
+                            "product",
+                            ProductParcelable::class.java
+                        )
+                    } else {
+                        @Suppress("DEPRECATION") backStackEntry.arguments?.getParcelable<ProductParcelable>(
+                            "product"
+                        )
+                    }
+                    if (product != null) {
+                        ProductDetailScreen(navController, product)
+                    }
                 }
             }
         }
