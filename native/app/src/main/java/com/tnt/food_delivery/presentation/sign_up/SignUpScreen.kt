@@ -179,25 +179,26 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
 @ExperimentalMaterial3Api
 @Composable
 fun CustomTextField(
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 25.dp)
+        .border(
+            width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
+        )
+        .shadow(
+            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+            spread = 20.dp,
+            blurRadius = 50.dp,
+            offsetX = 12.dp,
+            offsetY = 26.dp,
+        ),
     icon: Int,
     placeholder: String,
     value: String,
     onValueChange: (value: String) -> Unit
 ) {
     OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 25.dp)
-            .border(
-                width = 1.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
-            )
-            .shadow(
-                color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
-                spread = 20.dp,
-                blurRadius = 50.dp,
-                offsetX = 12.dp,
-                offsetY = 26.dp,
-            ),
+        modifier = modifier,
         value = value,
         colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
         onValueChange = onValueChange,

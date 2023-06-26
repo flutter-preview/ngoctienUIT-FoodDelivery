@@ -46,6 +46,7 @@ import com.tnt.food_delivery.presentation.filter.FilterScreen
 import com.tnt.food_delivery.presentation.home.HomeScreen
 import com.tnt.food_delivery.presentation.message.MessageScreen
 import com.tnt.food_delivery.presentation.notification.NotificationScreen
+import com.tnt.food_delivery.presentation.profile.ProfileScreen
 import com.tnt.food_delivery.presentation.upload_photo.UploadPhotoScreen
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
@@ -87,7 +88,7 @@ fun MainScreen(navController: NavController) {
                     1 -> MessageScreen(navController)
                     2 -> UploadPhotoScreen()
                     3 -> NotificationScreen()
-                    4 -> FilterScreen(navController)
+                    4 -> ProfileScreen(navController)
                 }
             }
             Card(
