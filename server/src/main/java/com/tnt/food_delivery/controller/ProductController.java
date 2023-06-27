@@ -10,6 +10,7 @@ import com.tnt.food_delivery.repository.ProductRepository;
 import com.tnt.food_delivery.repository.RatingRepository;
 import com.tnt.food_delivery.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import static com.tnt.food_delivery.data.model.Register.getCurrentTime;
 public class ProductController {
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     ProductRepository productRepository;
 

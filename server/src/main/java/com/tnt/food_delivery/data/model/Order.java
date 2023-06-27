@@ -31,22 +31,23 @@ public class Order {
     private String updateAt = getCurrentTime();
 
     @Builder.Default
-    private List<Product> products = new ArrayList<>();
+    private List<OrderItem> products = new ArrayList<>();
 
     @Builder.Default
     private PaymentMethod paymentMethod = PaymentMethod.CASH;
 
-    @NonNull
+    @Builder.Default
+    private StatusOrder status = StatusOrder.PENDING;
+
     private String address;
-
-    @NonNull
     private String wards;
-
-    @NonNull
     private String district;
-
-    @NonNull
     private String province;
+    private String orderNote;
+
+    public enum StatusOrder {
+        PENDING, PLACED, ACCEPT, DELIVERY, SUCCESS, CANCEL
+    }
 
     public enum PaymentMethod {
         CASH, PAYPAL,
