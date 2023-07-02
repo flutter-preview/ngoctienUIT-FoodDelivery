@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
-    @Query("{ name: { $regex: ?0, $options: 'i' }, status: { $regex: ?1 } }")
-    List<Order> findOrder();
+    @Query("{ 'user._id' : ?0, 'status': { $regex: ?1 } }")
+    List<Order> findOrder(String userIdentity, String status);
+
+    @Query("{'status': { $regex: ?0 } }")
+    List<Order> findOrder(String status);
 }

@@ -22,4 +22,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     @Query("{'$or': [ {'username': ?0} , {'email': ?1} ] }")
     User checkRegister(String username, String email);
+
+    @Query("{'$or': [ {'username': ?0} , {'email': ?0}, {'phoneNumber': ?0} ] }")
+    User getUser(String userIdentity);
 }

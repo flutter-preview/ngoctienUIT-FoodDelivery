@@ -3,7 +3,7 @@ package com.tnt.food_delivery.controller;
 import com.tnt.food_delivery.common.JwtUtils;
 import com.tnt.food_delivery.data.model.Order;
 import com.tnt.food_delivery.data.model.OrderItem;
-import com.tnt.food_delivery.data.model.Product;
+import com.tnt.food_delivery.data.model.User;
 import com.tnt.food_delivery.data.request.OrderRequest;
 import com.tnt.food_delivery.repository.OrderRepository;
 import com.tnt.food_delivery.repository.UserRepository;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.tnt.food_delivery.data.model.Register.getCurrentTime;
 
 @RestController
 @RequestMapping("api/v1/order")
@@ -38,8 +38,23 @@ public class OrderController {
             @RequestParam String userIdentity,
             @RequestParam String status
     ) {
-
-        return ResponseEntity.ok("");
+        try {
+            String content = JwtUtils.decodeJwtToken(token.split(" ")[1]).getSubject();
+            String userID = content.split("~")[0];
+            String role = content.split("~")[1];
+            if (role.equals("USER") && !userIdentity.isBlank()) {
+                User user = userRepository.getUser(userIdentity);
+                if (user.getId().equals(userID)) {
+                    return ResponseEntity.ok(orderRepository.findOrder(user.getId(), status));
+                }
+            }
+            if (userIdentity.isBlank() && role.equals("ADMIN")) {
+                return ResponseEntity.ok(orderRepository.findOrder(status));
+            }
+            return ResponseEntity.badRequest().body("Bạn không có quyền thay đổi thông tin sản phẩm này");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping
@@ -80,6 +95,14 @@ public class OrderController {
             if (role.equals("USER")
                     && userID.equals(order.getUser().getId())
                     && order.getStatus() == Order.StatusOrder.PENDING) {
+                order.setPaymentMethod(orderRequest.getPaymentMethod());
+                order.setProducts(orderService.transformFrom(orderRequest.getProducts()));
+                order.setAddress(orderRequest.getAddress());
+                order.setDistrict(orderRequest.getDistrict());
+                order.setProvince(orderRequest.getProvince());
+                order.setWards(orderRequest.getWards());
+                order.setOrderNote(orderRequest.getOrderNote());
+                order.setUpdateAt(getCurrentTime());
 
                 return ResponseEntity.ok(orderRepository.save(order));
             }
