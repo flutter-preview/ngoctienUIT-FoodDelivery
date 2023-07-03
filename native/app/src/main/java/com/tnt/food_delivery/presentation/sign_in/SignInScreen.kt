@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,7 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,6 +44,8 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +72,7 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
     val context = LocalContext.current
     val dataStoreManager = DataStoreManager(context)
     val coroutineScope = rememberCoroutineScope()
+    var isHide by remember { mutableStateOf(true) }
 
     LaunchedEffect(state) {
         Log.d("check", "ok")
@@ -133,7 +140,9 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                         viewModel.password.value = text
                         viewModel.validatePassword()
                     },
-                    error = viewModel.passwordErrMsg.value
+                    error = viewModel.passwordErrMsg.value,
+                    isHide = isHide,
+                    onChange = { isHide = !isHide },
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Or Continue With", fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -205,7 +214,9 @@ fun CustomTextField(
     placeholder: String,
     value: String,
     onValueChange: (value: String) -> Unit,
-    error: String = ""
+    error: String = "",
+    isHide: Boolean? = null,
+    onChange: (() -> Unit)? = null
 ) {
     Column {
         OutlinedTextField(
@@ -216,8 +227,21 @@ fun CustomTextField(
             placeholder = { Text(text = placeholder) },
             shape = RoundedCornerShape(30),
             maxLines = 1,
+            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            isError = error.isNotEmpty()
+            isError = error.isNotEmpty(),
+            trailingIcon = if (isHide != null) {
+                {
+                    Image(
+                        modifier = Modifier
+                            .size(25.dp)
+                            .clickable { onChange?.let { it() } },
+                        painter = painterResource(id = if (isHide) R.drawable.icon_eye_close else R.drawable.icon_eye_open),
+                        contentDescription = ""
+                    )
+                }
+            } else null,
+            visualTransformation = if (isHide != null && isHide) PasswordVisualTransformation() else VisualTransformation.None,
         )
         if (error.isNotEmpty())
             Text(

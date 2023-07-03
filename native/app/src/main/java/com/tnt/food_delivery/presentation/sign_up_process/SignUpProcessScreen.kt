@@ -1,7 +1,11 @@
 package com.tnt.food_delivery.presentation.sign_up_process
 
+import android.app.DatePickerDialog
 import android.util.Log
+import android.widget.DatePicker
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +55,7 @@ import com.tnt.food_delivery.ui.components.BackButton
 import com.tnt.food_delivery.ui.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +69,7 @@ fun SignUpProcessScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.register.observeAsState()
+    val calendar = Calendar.getInstance()
 
     LaunchedEffect(state)
     {
@@ -82,12 +89,20 @@ fun SignUpProcessScreen(
 
             EventStatus.ERROR -> {
                 Log.d("Error", state!!.error ?: "Lỗi bất định")
-                showToast(context, state!!.error ?: "Lỗi bất định");
+                showToast(context, state!!.error ?: "Lỗi bất định")
             }
 
             else -> {}
         }
     }
+
+    val datePicker = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+            viewModel.birthday.value = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+        }, calendar[Calendar.YEAR], calendar[Calendar.MONTH], calendar[Calendar.DAY_OF_MONTH]
+    )
+    datePicker.datePicker.maxDate = calendar.timeInMillis
 
     Scaffold {
         it
@@ -136,7 +151,9 @@ fun SignUpProcessScreen(
                 CustomTextField(
                     value = viewModel.birthday.value,
                     onValueChange = { value -> viewModel.birthday.value = value },
-                    hintText = "Birthday"
+                    hintText = "Birthday",
+                    onClick = { datePicker.show() },
+                    error = viewModel.birthdayErrMsg.value
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
@@ -182,8 +199,13 @@ fun CustomTextField(
     onValueChange: (value: String) -> Unit,
     hintText: String,
     error: String = "",
-    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+    onClick: (() -> Unit)? = null,
 ) {
+    val source = remember { MutableInteractionSource() }
+
+    if (source.collectIsPressedAsState().value) onClick?.let { it() }
+
     Column {
         OutlinedTextField(
             modifier = Modifier
@@ -203,8 +225,11 @@ fun CustomTextField(
             placeholder = { Text(text = hintText, color = Color(0xFF3B3B3B)) },
             shape = RoundedCornerShape(22),
             maxLines = 1,
+            singleLine = true,
             keyboardOptions = keyboardOptions,
-            isError = error.isNotEmpty()
+            isError = error.isNotEmpty(),
+            readOnly = onClick != null,
+            interactionSource = source
         )
         if (error.isNotEmpty())
             Text(

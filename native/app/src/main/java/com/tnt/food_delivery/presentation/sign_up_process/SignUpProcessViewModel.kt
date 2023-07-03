@@ -86,8 +86,8 @@ class SignUpProcessViewModel : ViewModel() {
 
     private fun enableButton() {
         val check: Boolean =
-            phoneNumberErrMsg.value.isEmpty() && fullNameErrMsg.value.isEmpty()
-                    && phoneNumber.value.isNotEmpty() && fullname.value.isNotEmpty()
+            phoneNumberErrMsg.value.isEmpty() && fullNameErrMsg.value.isEmpty() && birthdayErrMsg.value.isEmpty()
+                    && phoneNumber.value.isNotEmpty() && fullname.value.isNotEmpty() && birthday.value.isNotEmpty()
         if (isEnableButton.value != check) isEnableButton.value = check
     }
 }

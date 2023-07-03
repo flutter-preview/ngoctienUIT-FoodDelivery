@@ -31,6 +31,9 @@ class SignUpViewModel : ViewModel() {
     var password: MutableState<String> = mutableStateOf("")
     var passwordErrMsg: MutableState<String> = mutableStateOf("")
 
+    var confirmPassword: MutableState<String> = mutableStateOf("")
+    var confirmPasswordErrMsg: MutableState<String> = mutableStateOf("")
+
     var isEnableButton: MutableState<Boolean> = mutableStateOf(false)
 
     suspend fun checkRegister() {
@@ -93,6 +96,16 @@ class SignUpViewModel : ViewModel() {
             passwordErrMsg.value = "Độ dài mật khẩu tối thiểu 8 ký tự"
         } else {
             passwordErrMsg.value = ""
+        }
+        enableButton()
+    }
+
+    fun validateConfirmPassword() {
+        android.util.Patterns.EMAIL_ADDRESS
+        if (confirmPassword.value != password.value) {
+            confirmPasswordErrMsg.value = "Mật khẩu xác nhận không trùng khớp"
+        } else {
+            confirmPasswordErrMsg.value = ""
         }
         enableButton()
     }
