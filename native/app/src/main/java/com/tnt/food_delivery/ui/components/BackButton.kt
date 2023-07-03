@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.presentation.payment_method.components
+package com.tnt.food_delivery.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

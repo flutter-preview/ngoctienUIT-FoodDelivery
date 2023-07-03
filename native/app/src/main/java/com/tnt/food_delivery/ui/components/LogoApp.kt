@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.presentation.splash.components
+package com.tnt.food_delivery.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

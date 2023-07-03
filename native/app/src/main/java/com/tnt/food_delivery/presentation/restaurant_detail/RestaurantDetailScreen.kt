@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.payment_method.components.BackButton
+import com.tnt.food_delivery.ui.components.BackButton
 import com.tnt.food_delivery.presentation.restaurant_detail.components.IconRestaurant
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ProductItem
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ReviewItem

@@ -1,4 +1,4 @@
-package com.tnt.food_delivery.presentation.sign_in.components
+package com.tnt.food_delivery.ui.components
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.ui.Modifier

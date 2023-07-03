@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -60,8 +58,8 @@ import coil.request.ImageRequest
 import com.google.gson.Gson
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.data.response.ProductResponse
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
-import com.tnt.food_delivery.presentation.payment_method.components.BackButton
+import com.tnt.food_delivery.ui.components.GradientButton
+import com.tnt.food_delivery.ui.components.BackButton
 import com.tnt.food_delivery.presentation.restaurant_detail.CustomItem
 import com.tnt.food_delivery.presentation.restaurant_detail.components.IconRestaurant
 import com.tnt.food_delivery.presentation.restaurant_detail.components.ProductItem

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,9 +27,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,9 +52,9 @@ import com.tnt.food_delivery.core.components.showToast
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
 import com.tnt.food_delivery.data.DataStoreManager
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
-import com.tnt.food_delivery.presentation.sign_in.components.shadow
-import com.tnt.food_delivery.presentation.splash.components.LogoApp
+import com.tnt.food_delivery.ui.components.GradientButton
+import com.tnt.food_delivery.ui.components.shadow
+import com.tnt.food_delivery.ui.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
 
@@ -66,8 +62,6 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hiltViewModel()) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     val state by viewModel.authentication.observeAsState()
     val context = LocalContext.current
     val dataStoreManager = DataStoreManager(context)
@@ -95,7 +89,7 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
 
             EventStatus.ERROR -> {
                 Log.d("Error", state!!.error ?: "Lỗi bất định")
-                showToast(context, state!!.error ?: "Lỗi bất định");
+                showToast(context, state!!.error ?: "Lỗi bất định")
             }
 
             else -> {}
@@ -122,50 +116,24 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                 Spacer(modifier = Modifier.height(60.dp))
                 Text(text = "Login To Your Account", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(40.dp))
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 25.dp)
-                        .border(
-                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
-                        )
-                        .shadow(
-                            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
-                            spread = 20.dp,
-                            blurRadius = 50.dp,
-                            offsetX = 12.dp,
-                            offsetY = 26.dp,
-                        ),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-                    value = username,
-                    onValueChange = { text -> username = text },
-                    placeholder = { Text(text = "Username") },
-                    shape = RoundedCornerShape(30),
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                CustomTextField(
+                    placeholder = "Username",
+                    value = viewModel.username.value,
+                    onValueChange = { text ->
+                        viewModel.username.value = text
+                        viewModel.validateUsername()
+                    },
+                    error = viewModel.usernameErrMsg.value
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 25.dp)
-                        .border(
-                            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
-                        )
-                        .shadow(
-                            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
-                            spread = 20.dp,
-                            blurRadius = 50.dp,
-                            offsetX = 12.dp,
-                            offsetY = 26.dp,
-                        ),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-                    value = password,
-                    onValueChange = { text -> password = text },
-                    placeholder = { Text(text = "Password") },
-                    shape = RoundedCornerShape(30),
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                CustomTextField(
+                    placeholder = "Password",
+                    value = viewModel.password.value,
+                    onValueChange = { text ->
+                        viewModel.password.value = text
+                        viewModel.validatePassword()
+                    },
+                    error = viewModel.passwordErrMsg.value
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Or Continue With", fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -190,19 +158,11 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                 Spacer(modifier = Modifier.height(36.dp))
                 GradientButton(
                     text = "Login",
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.login(
-                                mapOf(
-                                    "username" to username,
-                                    "password" to password
-                                )
-                            )
-                        }
-                    },
+                    onClick = { coroutineScope.launch { viewModel.login() } },
                     modifier = Modifier
                         .height(56.dp)
                         .width(157.dp),
+                    isEnable = viewModel.isEnableButton.value
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(onClick = {
@@ -223,6 +183,49 @@ fun SignInScreen(navController: NavController, viewModel: SignInViewModel = hilt
                 if (state!!.status == EventStatus.LOADING) ShowLoading()
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTextField(
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 25.dp)
+        .border(
+            width = 2.dp, color = Color(0xFFF4F4F4), shape = RoundedCornerShape(30),
+        )
+        .shadow(
+            color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+            spread = 20.dp,
+            blurRadius = 50.dp,
+            offsetX = 12.dp,
+            offsetY = 26.dp,
+        ),
+    placeholder: String,
+    value: String,
+    onValueChange: (value: String) -> Unit,
+    error: String = ""
+) {
+    Column {
+        OutlinedTextField(
+            modifier = modifier,
+            colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = { Text(text = placeholder) },
+            shape = RoundedCornerShape(30),
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            isError = error.isNotEmpty()
+        )
+        if (error.isNotEmpty())
+            Text(
+                modifier = Modifier.padding(start = 35.dp),
+                text = error,
+                fontSize = 12.sp,
+                color = Color.Red
+            )
     }
 }
 

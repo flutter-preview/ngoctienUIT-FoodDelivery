@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.ui.components.GradientButton
 import com.tnt.food_delivery.presentation.sign_up.CustomTextField
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 

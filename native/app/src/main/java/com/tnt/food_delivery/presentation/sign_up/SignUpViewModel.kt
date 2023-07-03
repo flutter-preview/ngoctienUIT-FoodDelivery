@@ -1,6 +1,8 @@
 package com.tnt.food_delivery.presentation.sign_up
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,12 +22,28 @@ class SignUpViewModel : ViewModel() {
         MutableLiveData(EventResults())
     val register: LiveData<EventResults<RegisterResponse>> = _register
 
-    suspend fun checkRegister(body: Map<String, String>) {
+    var email: MutableState<String> = mutableStateOf("")
+    var emailErrMsg: MutableState<String> = mutableStateOf("")
+
+    var username: MutableState<String> = mutableStateOf("")
+    var usernameErrMsg: MutableState<String> = mutableStateOf("")
+
+    var password: MutableState<String> = mutableStateOf("")
+    var passwordErrMsg: MutableState<String> = mutableStateOf("")
+
+    var isEnableButton: MutableState<Boolean> = mutableStateOf(false)
+
+    suspend fun checkRegister() {
         Log.d("test", "sign up")
         _register.value = EventResults(status = EventStatus.LOADING)
         viewModelScope.launch {
             try {
-                val data = authService.checkRegister(body)
+                val data = authService.checkRegister(
+                    mapOf(
+                        "username" to username.value,
+                        "email" to email.value
+                    )
+                )
                 if (data.isSuccessful) {
                     if (data.body()!!.status) {
                         _register.value =
@@ -49,5 +67,40 @@ class SignUpViewModel : ViewModel() {
                 Log.d("error", e.message.toString())
             }
         }
+    }
+
+    fun validateEmail() {
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+            emailErrMsg.value = "Email không đúng định dạng"
+        } else {
+            emailErrMsg.value = ""
+        }
+        enableButton()
+    }
+
+    fun validateUsername() {
+        if (username.value.isEmpty()) {
+            usernameErrMsg.value = "Vui lòng nhập vào username"
+        } else {
+            usernameErrMsg.value = ""
+        }
+        enableButton()
+    }
+
+    fun validatePassword() {
+        android.util.Patterns.EMAIL_ADDRESS
+        if (password.value.length < 8) {
+            passwordErrMsg.value = "Độ dài mật khẩu tối thiểu 8 ký tự"
+        } else {
+            passwordErrMsg.value = ""
+        }
+        enableButton()
+    }
+
+    private fun enableButton() {
+        val check: Boolean =
+            passwordErrMsg.value.isEmpty() && emailErrMsg.value.isEmpty() && usernameErrMsg.value.isEmpty()
+                    && email.value.isNotEmpty() && password.value.isNotEmpty() && username.value.isNotEmpty()
+        if (isEnableButton.value != check) isEnableButton.value = check
     }
 }

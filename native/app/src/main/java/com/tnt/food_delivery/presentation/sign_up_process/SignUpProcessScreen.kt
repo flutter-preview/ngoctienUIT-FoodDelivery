@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -22,16 +25,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,9 +45,9 @@ import com.tnt.food_delivery.core.components.ShowLoading
 import com.tnt.food_delivery.core.components.showToast
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
-import com.tnt.food_delivery.presentation.payment_method.components.BackButton
-import com.tnt.food_delivery.presentation.sign_in.components.shadow
+import com.tnt.food_delivery.ui.components.GradientButton
+import com.tnt.food_delivery.ui.components.BackButton
+import com.tnt.food_delivery.ui.components.shadow
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
 
@@ -58,9 +60,6 @@ fun SignUpProcessScreen(
     password: String,
     viewModel: SignUpProcessViewModel = hiltViewModel()
 ) {
-    var firstname by remember { mutableStateOf("") }
-    var lastname by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.register.observeAsState()
@@ -99,7 +98,10 @@ fun SignUpProcessScreen(
                 contentDescription = "tnt"
             )
             Column(
-                modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                modifier = Modifier
+                    .padding(horizontal = 25.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
                 BackButton {
                     navController.popBackStack()
@@ -118,21 +120,37 @@ fun SignUpProcessScreen(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    value = firstname,
-                    onValueChange = { value -> firstname = value },
-                    hintText = "First Name"
+                    value = viewModel.fullname.value,
+                    onValueChange = { value ->
+                        viewModel.fullname.value = value
+                        viewModel.validateFullName()
+                    },
+                    hintText = "Full Name",
+                    error = viewModel.fullNameErrMsg.value,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        capitalization = KeyboardCapitalization.Words
+                    )
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    value = lastname,
-                    onValueChange = { value -> lastname = value },
-                    hintText = "Last Name"
+                    value = viewModel.birthday.value,
+                    onValueChange = { value -> viewModel.birthday.value = value },
+                    hintText = "Birthday"
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    value = phoneNumber,
-                    onValueChange = { value -> phoneNumber = value },
-                    hintText = "Mobile Number"
+                    value = viewModel.phoneNumber.value,
+                    onValueChange = { value ->
+                        viewModel.phoneNumber.value = value
+                        viewModel.validatePhoneNumber()
+                    },
+                    hintText = "Mobile Number",
+                    error = viewModel.phoneNumberErrMsg.value,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Phone
+                    )
                 )
                 Spacer(modifier = Modifier.height(50.dp))
                 Row(
@@ -145,22 +163,12 @@ fun SignUpProcessScreen(
                             .width(157.dp),
                         text = "Next",
                         onClick = {
-                            coroutineScope.launch {
-                                viewModel.signup(
-                                    mapOf(
-                                        "name" to "$firstname $lastname",
-                                        "password" to password,
-                                        "username" to username,
-                                        "email" to email,
-                                        "phoneNumber" to phoneNumber,
-                                        "isMale" to true,
-                                        "birthOfDate" to ""
-                                    )
-                                )
-                            }
+                            coroutineScope.launch { viewModel.signup(username, email, password) }
                         },
+                        isEnable = viewModel.isEnableButton.value
                     )
                 }
+                Spacer(modifier = Modifier.height(50.dp))
                 if (state!!.status == EventStatus.LOADING) ShowLoading()
             }
         }
@@ -169,27 +177,43 @@ fun SignUpProcessScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTextField(value: String, onValueChange: (value: String) -> Unit, hintText: String) {
-    OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
-                spread = 25.dp,
-                blurRadius = 60.dp
+fun CustomTextField(
+    value: String,
+    onValueChange: (value: String) -> Unit,
+    hintText: String,
+    error: String = "",
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+) {
+    Column {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    color = Color(0xFF5A6CEA).copy(alpha = 0.07f),
+                    spread = 25.dp,
+                    blurRadius = 60.dp
+                ),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                disabledBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                containerColor = Color.White,
             ),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            disabledBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            containerColor = Color.White,
-        ),
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = { Text(text = hintText, color = Color(0xFF3B3B3B)) },
-        shape = RoundedCornerShape(22),
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-    )
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = { Text(text = hintText, color = Color(0xFF3B3B3B)) },
+            shape = RoundedCornerShape(22),
+            maxLines = 1,
+            keyboardOptions = keyboardOptions,
+            isError = error.isNotEmpty()
+        )
+        if (error.isNotEmpty())
+            Text(
+                modifier = Modifier.padding(start = 35.dp),
+                text = error,
+                fontSize = 12.sp,
+                color = Color.Red
+            )
+    }
 }
 
 @Preview(showBackground = true)

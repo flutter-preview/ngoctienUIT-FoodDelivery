@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
+import com.tnt.food_delivery.ui.components.GradientButton
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
 

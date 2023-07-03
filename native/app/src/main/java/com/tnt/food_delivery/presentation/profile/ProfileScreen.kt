@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.profile.components.PostItem
+import com.tnt.food_delivery.ui.components.PostItem
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy

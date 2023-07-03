@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.splash.components.LogoApp
+import com.tnt.food_delivery.ui.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

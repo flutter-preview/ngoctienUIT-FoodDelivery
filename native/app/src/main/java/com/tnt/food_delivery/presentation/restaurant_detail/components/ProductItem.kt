@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tnt.food_delivery.R
-import com.tnt.food_delivery.presentation.sign_in.components.shadow
+import com.tnt.food_delivery.ui.components.shadow
 
 @Composable
 fun ProductItem(isStart: Boolean) {

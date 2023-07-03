@@ -23,13 +23,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,6 +36,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,12 +46,11 @@ import androidx.navigation.compose.rememberNavController
 import com.tnt.food_delivery.R
 import com.tnt.food_delivery.core.components.ShowLoading
 import com.tnt.food_delivery.core.components.showToast
-import com.tnt.food_delivery.core.utils.EventResults
 import com.tnt.food_delivery.core.utils.EventStatus
 import com.tnt.food_delivery.core.utils.NavDestinations
-import com.tnt.food_delivery.presentation.onboarding.components.GradientButton
-import com.tnt.food_delivery.presentation.sign_in.components.shadow
-import com.tnt.food_delivery.presentation.splash.components.LogoApp
+import com.tnt.food_delivery.ui.components.GradientButton
+import com.tnt.food_delivery.ui.components.shadow
+import com.tnt.food_delivery.ui.components.LogoApp
 import com.tnt.food_delivery.ui.theme.FoodDeliveryTheme
 import kotlinx.coroutines.launch
 
@@ -62,9 +58,6 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
-    var username by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.register.observeAsState()
@@ -74,7 +67,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
         Log.d("check", "ok")
         when (state!!.status) {
             EventStatus.SUCCESS -> {
-                navController.navigate("${NavDestinations.SIGNUP_PROCESS_SCREEN}/$username/$email/$password") {
+                navController.navigate("${NavDestinations.SIGNUP_PROCESS_SCREEN}/${viewModel.username.value}/${viewModel.email.value}/${viewModel.password.value}") {
                     navController.graph.startDestinationRoute?.let { route ->
                         popUpTo(route) { saveState = true }
                     }
@@ -90,7 +83,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
 
             EventStatus.ERROR -> {
                 Log.d("Error", state!!.error ?: "Lỗi bất định")
-                showToast(context, state!!.error ?: "Lỗi bất định");
+                showToast(context, state!!.error ?: "Lỗi bất định")
             }
 
             else -> {}
@@ -119,23 +112,39 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                 Spacer(modifier = Modifier.height(40.dp))
                 CustomTextField(
                     icon = R.drawable.icon_profile,
-                    value = username,
-                    onValueChange = { value -> username = value },
-                    placeholder = "Username"
+                    value = viewModel.username.value,
+                    onValueChange = { value ->
+                        viewModel.username.value = value
+                        viewModel.validateUsername()
+                    },
+                    placeholder = "Username",
+                    error = viewModel.usernameErrMsg.value
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 CustomTextField(
                     icon = R.drawable.icon_email,
-                    value = email,
-                    onValueChange = { value -> email = value },
-                    placeholder = "Email"
+                    value = viewModel.email.value,
+                    onValueChange = { value ->
+                        viewModel.email.value = value
+                        viewModel.validateEmail()
+                    },
+                    placeholder = "Email",
+                    error = viewModel.emailErrMsg.value,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Email
+                    ),
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 CustomTextField(
                     icon = R.drawable.icon_lock,
-                    value = password,
-                    onValueChange = { value -> password = value },
-                    placeholder = "Password"
+                    value = viewModel.password.value,
+                    onValueChange = { value ->
+                        viewModel.password.value = value
+                        viewModel.validatePassword()
+                    },
+                    placeholder = "Password",
+                    error = viewModel.passwordErrMsg.value
                 )
                 Spacer(modifier = Modifier.height(44.dp))
                 GradientButton(
@@ -143,16 +152,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = hilt
                     modifier = Modifier
                         .height(56.dp)
                         .width(157.dp),
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.checkRegister(
-                                mapOf(
-                                    "username" to username,
-                                    "email" to email
-                                )
-                            )
-                        }
-                    }
+                    isEnable = viewModel.isEnableButton.value,
+                    onClick = { coroutineScope.launch { viewModel.checkRegister() } }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextButton(onClick = {
@@ -195,25 +196,42 @@ fun CustomTextField(
     icon: Int,
     placeholder: String,
     value: String,
-    onValueChange: (value: String) -> Unit
+    onValueChange: (value: String) -> Unit,
+    error: String = "",
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
 ) {
-    OutlinedTextField(
-        modifier = modifier,
-        value = value,
-        colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
-        onValueChange = onValueChange,
-        placeholder = { Text(text = placeholder, color = Color(0xFF3B3B3B).copy(alpha = 0.3f)) },
-        shape = RoundedCornerShape(30),
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        leadingIcon = {
-            Image(
-                modifier = Modifier.height(30.dp),
-                painter = painterResource(id = icon),
-                contentDescription = "icon profile",
+    Column {
+        OutlinedTextField(
+            modifier = modifier,
+            value = value,
+            isError = error.isNotEmpty(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(containerColor = Color.White),
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    color = Color(0xFF3B3B3B).copy(alpha = 0.3f)
+                )
+            },
+            shape = RoundedCornerShape(30),
+            maxLines = 1,
+            keyboardOptions = keyboardOptions,
+            leadingIcon = {
+                Image(
+                    modifier = Modifier.height(30.dp),
+                    painter = painterResource(id = icon),
+                    contentDescription = "icon profile",
+                )
+            },
+        )
+        if (error.isNotEmpty())
+            Text(
+                modifier = Modifier.padding(start = 35.dp),
+                text = error,
+                fontSize = 12.sp,
+                color = Color.Red
             )
-        }
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
